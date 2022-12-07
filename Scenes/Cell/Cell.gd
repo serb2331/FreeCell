@@ -1,6 +1,6 @@
 extends TextureButton
 
-var card_num = 14
+var card_num = 5
 
 func _ready():
 	texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", card_num)
