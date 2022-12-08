@@ -8,7 +8,13 @@ extends Node
 onready var DECK_SPRITESHEET = load("res://Assets/card_deck.tres")
 
 # cascade Array of Arrays for memorizing card order for each cascade(column)
-var cascades: Array = [ [], [], [], [], [], [], [], []]
+var cascades: Array = [ [], [], [], [], [], [], [], [] ]
+
+# foundations Array of Arrays to hold solved cards
+var foundations: Array = [ [], [], [], [] ]
+
+# free_cells Array of 4 empty cells that will hold the temporary cards 
+var free_cells: Array = [52, 52, 52, 52]
 
 class Card:
 	var id          # (from 0 to 51)
@@ -82,4 +88,10 @@ func add_to_cascades(ids: Array):
 func empty_board():
 	cascades.clear()
 	cascades.append_array([ [], [], [], [], [], [], [], [] ])
+	
+	foundations.clear()
+	foundations.append_array([ [], [], [], [] ])
+	
+	free_cells.clear()
+	free_cells.append_array([ 52, 52, 52, 52])
 	pass
