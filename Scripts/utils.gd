@@ -8,13 +8,13 @@ extends Node
 onready var DECK_SPRITESHEET = load("res://Assets/card_deck.tres")
 
 # cascade Array of Arrays for memorizing card order for each cascade(column)
-var cascades: Array = [ [], [], [], [], [], [], [], [] ]
+var cascade_id: Array = [ [], [], [], [], [], [], [], [] ]
 
 # foundations Array of Arrays to hold solved cards
-var foundations: Array = [ [], [], [], [] ]
+var foundation_id: Array = [ [], [], [], [] ]
 
 # free_cells Array of 4 empty cells that will hold the temporary cards 
-var free_cells: Array = [52, 52, 52, 52]
+var free_cell_id: Array = [52, 52, 52, 52]
 
 class Card:
 	var id          # (from 0 to 51)
@@ -40,7 +40,7 @@ func _ready():
 func _process(delta):
 	if Input.is_action_just_pressed("ui_accept"):
 		empty_board()
-		add_to_cascades(create_set())
+		add_to_cascade_id(create_set())
 	pass
 
 #Cards: from 0 -> 51
@@ -78,20 +78,20 @@ func create_set() -> Array:
 	pass
 
 # add randomzied nums to cascades Array
-func add_to_cascades(ids: Array):
+func add_to_cascade_id(ids: Array):
 	for i in range(52):
 		var casc = i % 8
-		cascades[casc].append(ids[i])
-	print(cascades)
+		cascade_id[casc].append(ids[i])
+	print(cascade_id)
 	pass
 
 func empty_board():
-	cascades.clear()
-	cascades.append_array([ [], [], [], [], [], [], [], [] ])
+	cascade_id.clear()
+	cascade_id.append_array([ [], [], [], [], [], [], [], [] ])
 	
-	foundations.clear()
-	foundations.append_array([ [], [], [], [] ])
+	foundation_id.clear()
+	foundation_id.append_array([ [], [], [], [] ])
 	
-	free_cells.clear()
-	free_cells.append_array([ 52, 52, 52, 52])
+	free_cell_id.clear()
+	free_cell_id.append_array([ 52, 52, 52, 52])
 	pass

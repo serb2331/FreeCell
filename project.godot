@@ -11,11 +11,17 @@ config_version=4
 [application]
 
 config/name="FreeCell"
+run/main_scene="res://Scenes/Board/Board.tscn"
 config/icon="res://icon.png"
 
 [autoload]
 
 Utils="*res://Scripts/utils.gd"
+
+[display]
+
+window/stretch/mode="2d"
+window/stretch/aspect="expand"
 
 [gui]
 
