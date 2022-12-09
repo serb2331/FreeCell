@@ -35,6 +35,7 @@ class Card:
 		pass
 
 func _ready():
+	create_positions()
 	pass
 
 func _process(delta):
@@ -94,4 +95,29 @@ func empty_board():
 	
 	free_cell_id.clear()
 	free_cell_id.append_array([ 52, 52, 52, 52])
+	pass
+
+# for cardpos2D positions:
+# - separately have positios for the free_cells and foundations
+# 
+# - top_left_pos var
+# - gap_x var for the gap between the cascades
+# - gap_y var for the gap between the cards in the cascades
+
+# card sprite dimensions = (33, 45)
+var card_pos_2D: Array = [ [], [], [], [], [], [], [], [] ]
+
+var top_left_pos: Vector2 = Vector2(30, 30)
+var gap_x = 37
+var gap_y = 50
+
+func create_positions():
+	for i in range(8):
+		var node = Node.new()
+		
+		for j in range(14):
+			var position_2d = Position2D.new()
+			position_2d.position.x = top_left_pos.x + (i - 1) * gap_x
+			position_2d.position.y = top_left_pos.y + (j - 1) * gap_y
+			get_tree().get_root().get_node("Board/Cascade" + String(i)).add_child(position_2d) 
 	pass
