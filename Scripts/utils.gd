@@ -1,10 +1,5 @@
 extends Node
 
-#CARD NOTATION:
-#	- cascade = column in the board
-#	- cell = empty space for a card to occupy
-#	- foundation = pile of the solved cards
-
 onready var DECK_SPRITESHEET = load("res://Assets/card_deck.tres")
 
 # cascade Array of Arrays for memorizing card order for each cascade(column)
@@ -16,7 +11,14 @@ var foundation_id: Array = [ [], [], [], [] ]
 # free_cells Array of 4 empty cells that will hold the temporary cards 
 var free_cell_id: Array = [52, 52, 52, 52]
 
-class Card:
+# --------------------------- CARD CLASS ---------------------------------------------------------------------------
+
+#CARD NOTATION:
+#	- cascade = column in the board
+#	- cell = empty space for a card to occupy
+#	- foundation = pile of the solved cards
+
+class Card extends Node:
 	var id          # (from 0 to 51)
 	var card_color  # (from 0 to 3)
 	var card_number # (from 0 to 12)
@@ -34,18 +36,7 @@ class Card:
 		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		pass
 
-func _ready():
-	create_positions()
-	for i in range(8):
-		for j in range(14):
-			print(card_pos[i][j])
-	pass
-
-func _process(delta):
-	if Input.is_action_just_pressed("ui_accept"):
-		empty_board()
-		add_to_cascade_id(create_set())
-	pass
+# ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
 
 #Cards: from 0 -> 51
 #4 sets - hearts (♥)
@@ -57,7 +48,7 @@ func _process(delta):
 #- num / 13 => card colour
 #- num % 13 => card number
 
-func create_set() -> Array:
+func create_set():
 	# using randomize() to randomize the seed of the 
 	# internal random number generator
 	randomize()
@@ -68,7 +59,8 @@ func create_set() -> Array:
 	for i in range(52):
 		card_id.append(i)
 	
-	# randomizing the number array by picking random position and swapping between them
+	# randomizing the number array by picking random position
+	# and swapping between them
 	for i in range(52):
 		var poz: int = randi() % 52
 		# aux for swapping
@@ -78,16 +70,39 @@ func create_set() -> Array:
 		card_id[poz] = aux
 	
 	# YOU HAPPY NOW IOSUA?
-	return card_id
-	pass
-
-# add randomzied nums to cascades Array
-func add_to_cascade_id(ids: Array):
+	
+	# adding the randomized array to the cascade_id array
 	for i in range(52):
 		var casc = i % 8
-		cascade_id[casc].append(ids[i])
-	print(cascade_id)
+		cascade_id[casc].append(card_id[i])
 	pass
+
+# -------------------------------- CREATING POSITIONS ----------------------------------------------------------------
+
+# for cardpos2D positions:
+# - separately have positios for the free_cells and foundations
+# 
+# - top_left_pos var
+# - gap_x var for the gap between the cascades
+# - gap_y var for the gap between the cards in the cascades
+
+# card sprite dimensions = (33, 45)
+var casc_positions = [ [], [], [], [], [], [], [], [] ]
+
+var top_left_pos: Vector2 = Vector2(30, 30)
+var gap_x = 37
+var gap_y = 50
+
+func create_positions():
+	for i in range(8):
+		for j in range(14):
+			var pos: Vector2 = Vector2.ZERO
+			pos.x = top_left_pos.x + i * gap_x
+			pos.y = top_left_pos.y + j * gap_y
+			casc_positions[i].append(pos)
+	pass
+
+# -------------------------------- GAME START/ RESTART FUCNTIONS ----------------------------------------------
 
 func empty_board():
 	cascade_id.clear()
@@ -100,25 +115,12 @@ func empty_board():
 	free_cell_id.append_array([ 52, 52, 52, 52])
 	pass
 
-# for cardpos2D positions:
-# - separately have positios for the free_cells and foundations
-# 
-# - top_left_pos var
-# - gap_x var for the gap between the cascades
-# - gap_y var for the gap between the cards in the cascades
+# --------------------------------- _ready() and _process(delta) ----------------------------------------
 
-# card sprite dimensions = (33, 45)
-var card_pos = [ [], [], [], [], [], [], [], [] ]
+func _ready():
+	create_positions()
+	pass
 
-var top_left_pos: Vector2 = Vector2(30, 30)
-var gap_x = 37
-var gap_y = 50
-
-func create_positions():
-	for i in range(8):
-		for j in range(14):
-			var pos: Vector2
-			pos.x = top_left_pos.x + i * gap_x
-			pos.y = top_left_pos.y + j * gap_y
-			card_pos[i].append(pos)
+func _process(delta):
+	
 	pass
