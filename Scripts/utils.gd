@@ -89,9 +89,9 @@ func create_set():
 # card sprite dimensions = (33, 45)
 var casc_positions = [ [], [], [], [], [], [], [], [] ]
 
-var top_left_pos: Vector2 = Vector2(30, 30)
+var top_left_pos: Vector2 = Vector2(100, 100)
 var gap_x = 37
-var gap_y = 50
+var gap_y = 13
 
 func create_positions():
 	for i in range(8):
