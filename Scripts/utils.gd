@@ -3,13 +3,13 @@ extends Node
 onready var DECK_SPRITESHEET = load("res://Assets/card_deck_bordered.tres")
 
 # cascade Array of Arrays for memorizing card order for each cascade(column)
-var cascade_id: Array = [ [], [], [], [], [], [], [], [] ]
+var casc_id: Array = [ [], [], [], [], [], [], [], [] ]
 
 # foundations Array of Arrays to hold solved cards
-var foundation_id: Array = [ [], [], [], [] ]
+var found_id: Array = [ [], [], [], [] ]
 
 # free_cells Array of 4 empty cells that will hold the temporary cards 
-var free_cell_id: Array = [52, 52, 52, 52]
+var fc_id: Array = [52, 52, 52, 52]
 
 # --------------------------- CARD CLASS ---------------------------------------------------------------------------
 
@@ -33,6 +33,11 @@ class Card extends Node:
 		self.card_number = id % 13
 		
 		# set texture for the button for the specific frame in the spritesheet
+		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
+		pass
+	
+	func change_id(id):
+		self.id = id
 		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		pass
 
@@ -74,7 +79,7 @@ func create_set():
 	# adding the randomized array to the cascade_id array
 	for i in range(52):
 		var casc = i % 8
-		cascade_id[casc].append(card_id[i])
+		casc_id[casc].append(card_id[i])
 	pass
 
 # -------------------------------- CREATING POSITIONS ----------------------------------------------------------------
@@ -104,16 +109,18 @@ func create_positions():
 
 # -------------------------------- GAME START/ RESTART FUCNTIONS ----------------------------------------------
 
-func empty_board():
-	cascade_id.clear()
-	cascade_id.append_array([ [], [], [], [], [], [], [], [] ])
-	
-	foundation_id.clear()
-	foundation_id.append_array([ [], [], [], [] ])
-	
-	free_cell_id.clear()
-	free_cell_id.append_array([ 52, 52, 52, 52])
-	pass
+# MOVED EMPTY_BOARD() TO BOARD SCRIPT
+
+#func empty_board():
+#	casc_id.clear()
+#	casc_id.append_array([ [], [], [], [], [], [], [], [] ])
+#
+#	found_id.clear()
+#	found_id.append_array([ [], [], [], [] ])
+#
+#	fc_id.clear()
+#	fc_id.append_array([ 52, 52, 52, 52])
+#	pass
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
 

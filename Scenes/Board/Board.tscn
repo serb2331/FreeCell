@@ -14,4 +14,6 @@ text = "Start"
 
 [node name="Cards" type="Node" parent="."]
 
+[node name="NULLCARD" type="Node" parent="Cards" groups=["Cascade1", "Cascade2", "Cascade3", "Cascade4", "Cascade5", "Cascade6", "Cascade7", "Cascade8"]]
+
 [connection signal="pressed" from="StartButton" to="." method="_on_StartButton_pressed"]
