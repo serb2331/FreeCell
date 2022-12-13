@@ -1,6 +1,6 @@
 extends Node
 
-onready var DECK_SPRITESHEET = load("res://Assets/card_deck.tres")
+onready var DECK_SPRITESHEET = load("res://Assets/card_deck_bordered.tres")
 
 # cascade Array of Arrays for memorizing card order for each cascade(column)
 var cascade_id: Array = [ [], [], [], [], [], [], [], [] ]
