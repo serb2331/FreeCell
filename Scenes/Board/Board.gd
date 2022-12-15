@@ -1,29 +1,26 @@
 extends Control
 
-# cascade Array of Arrays for memorizing card order for each cascade(column)
-var casc_id: Array = [ [], [], [], [], [], [], [], [] ]
-
-# foundations Array of Arrays to hold solved cards
-var found_id: Array = [ [], [], [], [] ]
-
-# free_cells Array of 4 empty cells that will hold the temporary cards 
-var fc_id: Array = [52, 52, 52, 52]
+var id_pos: Array = []
+var cards: Array = []
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
 
 func _ready():
 	# create postitions for all possible card objects
+	clear_board()
 	create_positions()
 	# create card objects and give them the corresponding positions with a blank sprite
 	# this is so we dont create 52 objects every game reset
-	for i in range(8):
-		for j in range(14):
-			var card = Utils.Card.new(52)
-			card.texture_button.set_position(casc_positions[i][j])
-			$Cards.add_child(card)
-			card.add_child(card.texture_button)
-			# add the card object to a cascade group that contains all cards in that cascade
-			card.add_to_group("Cascade" + String(i % 8 + 1))
+	
+	
+	for i in range(52):
+		var card = Utils.Card.new(-1)
+		card.texture_button.set_position(casc_pos[i % 8][i / 8])
+		cards.append(card)
+		$Cards.add_child(card)
+		card.add_child(card.texture_button)
+		
+		
 	pass
 
 func _process(delta):
@@ -33,33 +30,36 @@ func _process(delta):
 
 func _on_StartButton_pressed():
 	# on start empty the board and create a new randomized set
-	empty_board()
+	clear_board()
 	create_set()
-	# give card objects respective ids
-	for i in range(52):
-		# card pos -> (i % 8, i / 8)
-		var card = get_tree().get_nodes_in_group("Cascade" + String(i % 8 + 1))[i / 8 + 1]
-		card.change_id(casc_id[i % 8][i / 8])
-		pass
 	pass 
 
-func empty_board():
+func clear_board():
 	casc_id.clear()
 	casc_id.append_array([ [], [], [], [], [], [], [], [] ])
-	
-	for i in range(8):
-		for j in range(14):
-			get_tree().get_nodes_in_group("Cascade" + String(i % 8 + 1))[j + 1].change_id(52)
-	
+
 	found_id.clear()
 	found_id.append_array([ [], [], [], [] ])
 	
 	fc_id.clear()
 	fc_id.append_array([ 52, 52, 52, 52])
 	
+	id_pos.clear()
+	for i in range(52):
+		id_pos.append(null)
+	
 	pass
 
 # ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
+
+# cascade Array of Arrays for memorizing card order for each cascade(column)
+var casc_id: Array = [ [], [], [], [], [], [], [], [] ]
+
+# foundations Array of Arrays to hold solved cards (starts empty)
+var found_id: Array = [ [], [], [], [] ]
+
+# free_cells Array of 4 empty cells that will hold the temporary cards (starts empty) 
+var fc_id: Array = [52, 52, 52, 52]
 
 #Cards: from 0 -> 51
 #4 sets - hearts (♥) -> 0
@@ -110,7 +110,9 @@ func create_set():
 # - gap_y var for the gap between the cards in the cascades
 
 # card sprite dimensions = (33, 45)
-var casc_positions = [ [], [], [], [], [], [], [], [] ]
+var casc_pos = [ [], [], [], [], [], [], [], [] ]
+var found_pos = []
+var fc_pos = []
 
 var top_left_pos: Vector2 = Vector2(100, 100)
 var gap_x = 37
@@ -122,5 +124,5 @@ func create_positions():
 			var pos: Vector2 = Vector2.ZERO
 			pos.x = top_left_pos.x + i * gap_x
 			pos.y = top_left_pos.y + j * gap_y
-			casc_positions[i].append(pos)
+			casc_pos[i].append(pos)
 	pass
