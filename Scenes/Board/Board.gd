@@ -1,6 +1,5 @@
 extends Control
 
-var id_pos: Array = []
 var cards: Array = []
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
@@ -12,16 +11,7 @@ func _ready():
 	# create card objects and give them the corresponding positions with a blank sprite
 	# this is so we dont create 52 objects every game reset
 	
-	
-	for i in range(52):
-		var card = Utils.Card.new(-1)
-		card.texture_button.set_position(casc_pos[i % 8][i / 8])
-		cards.append(card)
-		$Cards.add_child(card)
-		card.add_child(card.texture_button)
-		
-		
-	pass
+	create_cards()
 
 func _process(delta):
 	pass
@@ -31,8 +21,18 @@ func _process(delta):
 func _on_StartButton_pressed():
 	# on start empty the board and create a new randomized set
 	clear_board()
+	create_cards()
 	create_set()
 	pass 
+
+func create_cards():
+	for i in range(52):
+		var card = Utils.Card.new(i)
+		card.rect_position = casc_pos[i % 8][i / 8]
+		cards.append(card)
+		$Cards.add_child(card)
+		card.add_child(card.texture_button)
+	pass
 
 func clear_board():
 	casc_id.clear()
@@ -44,9 +44,9 @@ func clear_board():
 	fc_id.clear()
 	fc_id.append_array([ 52, 52, 52, 52])
 	
-	id_pos.clear()
-	for i in range(52):
-		id_pos.append(null)
+	for i in cards:
+		i.queue_free()
+	cards.clear()
 	
 	pass
 

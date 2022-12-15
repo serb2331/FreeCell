@@ -9,7 +9,7 @@ onready var DECK_SPRITESHEET = load("res://Assets/card_deck_bordered.tres")
 #	- cell = empty space for a card to occupy
 #	- foundation = pile of the solved cards
 
-class Card extends Node:
+class Card extends Control:
 	var id          # (from 0 to 51)
 	var card_color  # (from 0 to 3)
 	var card_number # (from 0 to 12)
