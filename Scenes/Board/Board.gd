@@ -5,13 +5,12 @@ var cards: Array = []
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
 
 func _ready():
-	# create postitions for all possible card objects
-	clear_board()
+	# create all possible card object positions
 	create_positions()
-	# create card objects and give them the corresponding positions with a blank sprite
-	# this is so we dont create 52 objects every game reset
-	
+	# create the 52 cards and give them positions (c1 -> (0,0), c2 -> (1,0) ...)
 	create_cards()
+	give_cards_start_pos()
+	pass
 
 func _process(delta):
 	pass
@@ -19,19 +18,47 @@ func _process(delta):
 # -------------------------------- GAME START/ RESTART FUCNTIONS ----------------------------------------------
 
 func _on_StartButton_pressed():
-	# on start empty the board and create a new randomized set
+	# on start clear the board of all ids
 	clear_board()
-	create_cards()
-	create_set()
+	# move all cards back to start positions
+	give_cards_start_pos()
+	# give randomized ids to cards and move 
+	give_cards_rand_pos()
 	pass 
 
 func create_cards():
 	for i in range(52):
 		var card = Utils.Card.new(i)
-		card.rect_position = casc_pos[i % 8][i / 8]
 		cards.append(card)
 		$Cards.add_child(card)
 		card.add_child(card.texture_button)
+	pass
+
+func give_cards_start_pos():
+	# give cards positions (c1 -> (0,0), c2 -> (1,0) ...)
+	for i in cards:		
+		# change cascade coordonate 
+		i.casc_coord = Vector2(i.id % 8, i.id / 8)
+		
+		# change pos
+		i.pos = casc_pos[i.id % 8][i.id / 8]
+	pass
+
+func give_cards_rand_pos():
+	# randomize a new set of ids
+	create_set()
+	
+	# 1 -take every id in casc_id,
+	# 2 -look for card with that id in cards
+	# 3 -give that card the pos from casc_pos
+	for i in range(52):
+		#1
+		var id = casc_id[i % 8][i / 8]
+		#2
+		var card = cards[id]
+		#3
+		card.pos = casc_pos[i % 8][i / 8]
+	
 	pass
 
 func clear_board():
@@ -43,10 +70,6 @@ func clear_board():
 	
 	fc_id.clear()
 	fc_id.append_array([ 52, 52, 52, 52])
-	
-	for i in cards:
-		i.queue_free()
-	cards.clear()
 	
 	pass
 
