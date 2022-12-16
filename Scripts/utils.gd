@@ -9,7 +9,7 @@ onready var DECK_SPRITESHEET = load("res://Assets/card_deck_bordered.tres")
 #	- cell = empty space for a card to occupy
 #	- foundation = pile of the solved cards
 
-class Card extends Node:
+class Card extends Control:
 	var id          # (from 0 to 51)
 	var card_color  # (from 0 to 3)
 	var card_number # (from 0 to 12)
@@ -17,7 +17,11 @@ class Card extends Node:
 	# texture_button property for the card texture as well as clicking capabilities
 	var texture_button: TextureButton = TextureButton.new()
 	
+	# cascade coordonates
+	var casc_coord 
+	
 	# positions
+	var pos = Vector2.ZERO
 	
 	# Constructor
 	func _init(id):
@@ -29,9 +33,10 @@ class Card extends Node:
 		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		pass
 	
-	func change_id(id):
-		self.id = id
-		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
+	func _process(delta):
+		# since i dont really know lerp for now
+		# self.rect_position = lerp(self.rect_position, pos, 0.5) 
+		self.rect_position = self.pos
 		pass
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
