@@ -5,6 +5,7 @@ var cards: Array = []
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
 
 func _ready():
+	set_process(false)
 	# create all possible card object positions
 	create_positions()
 	# create the 52 cards and give them positions (c1 -> (0,0), c2 -> (1,0) ...)
@@ -18,7 +19,14 @@ func _process(delta):
 # -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
 
 func check_selectable_cards():
-	
+	for i in range(8):
+		var casc_size = casc_id[i].size()
+		for j in range(casc_size):
+			var card = cards[casc_id[i][j]]
+			if j == casc_size - 1:
+				card.selectable = true
+			else:
+				card.selectable = false
 	pass
 
 # -------------------------------- GAME START/ RESTART FUCNTIONS ----------------------------------------------
@@ -30,7 +38,9 @@ func _on_StartButton_pressed():
 	give_cards_start_pos()
 	# give randomized ids to cards and move 
 	give_cards_rand_pos()
+	# wait for cards to go to their positions
 	yield(get_tree().create_timer(1.5), "timeout")
+	set_process(true)
 	pass 
 
 func create_cards():
@@ -143,8 +153,8 @@ func create_set():
 
 # card sprite dimensions = (33, 45)
 var casc_pos = [ [], [], [], [], [], [], [], [] ]
-var found_pos = []
-var fc_pos = []
+var found_pos = [Vector2(295, 20), Vector2(335, 20), Vector2(370, 20), Vector2()]
+var fc_pos = [Vector2(60, 20), Vector2(100, 20), Vector2(140, 20), Vector2(180, 20)]
 
 var card_start_pos = Vector2(240, 20)
 var top_left_casc_pos: Vector2 = Vector2(100, 100)

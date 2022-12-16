@@ -23,7 +23,6 @@ margin_left = 60.0
 margin_top = 20.0
 margin_right = 93.0
 margin_bottom = 65.0
-rect_pivot_offset = Vector2( 42, 33 )
 texture_normal = ExtResource( 3 )
 
 [node name="FreeCell2" type="TextureButton" parent="Cards"]
@@ -31,7 +30,6 @@ margin_left = 100.0
 margin_top = 20.0
 margin_right = 133.0
 margin_bottom = 65.0
-rect_pivot_offset = Vector2( 42, 33 )
 texture_normal = ExtResource( 3 )
 
 [node name="FreeCell3" type="TextureButton" parent="Cards"]
@@ -39,7 +37,6 @@ margin_left = 140.0
 margin_top = 20.0
 margin_right = 173.0
 margin_bottom = 65.0
-rect_pivot_offset = Vector2( 42, 33 )
 texture_normal = ExtResource( 3 )
 
 [node name="FreeCell4" type="TextureButton" parent="Cards"]
@@ -47,7 +44,6 @@ margin_left = 180.0
 margin_top = 20.0
 margin_right = 213.0
 margin_bottom = 65.0
-rect_pivot_offset = Vector2( 42, 33 )
 texture_normal = ExtResource( 3 )
 
 [node name="Foundation1" type="TextureButton" parent="Cards"]

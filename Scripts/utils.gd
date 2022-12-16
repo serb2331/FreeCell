@@ -39,6 +39,10 @@ class Card extends Control:
 	func _process(delta):
 		# since i dont really know lerp for now
 		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 50) 
+		if selectable:
+			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", 53)
+		else:
+			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		pass
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
