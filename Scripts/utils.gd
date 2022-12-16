@@ -20,8 +20,11 @@ class Card extends Control:
 	# cascade coordonates
 	var casc_coord 
 	
-	# positions
+	# position on screen
 	var pos = Vector2.ZERO
+	
+	# if is the top card in cascade or is in fc
+	var selectable: bool = false
 	
 	# Constructor
 	func _init(id):

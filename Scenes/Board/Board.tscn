@@ -1,22 +1,89 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Scenes/Board/Board.gd" type="Script" id=1]
 [ext_resource path="res://Assets/card_deck.png" type="Texture" id=2]
+[ext_resource path="res://Assets/empty_card.png" type="Texture" id=3]
 
 [node name="Board" type="Control"]
-anchor_right = 1.0
-anchor_bottom = 1.0
+margin_right = 512.0
+margin_bottom = 300.0
 script = ExtResource( 1 )
 
 [node name="StartButton" type="Button" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_top = -50.0
 margin_right = 50.0
-margin_bottom = 50.0
 text = "Start"
 
 [node name="Cards" type="YSort" parent="."]
 
+[node name="FreeCell1" type="TextureButton" parent="Cards"]
+margin_left = 60.0
+margin_top = 20.0
+margin_right = 93.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
+[node name="FreeCell2" type="TextureButton" parent="Cards"]
+margin_left = 100.0
+margin_top = 20.0
+margin_right = 133.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
+[node name="FreeCell3" type="TextureButton" parent="Cards"]
+margin_left = 140.0
+margin_top = 20.0
+margin_right = 173.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
+[node name="FreeCell4" type="TextureButton" parent="Cards"]
+margin_left = 180.0
+margin_top = 20.0
+margin_right = 213.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
+[node name="Foundation1" type="TextureButton" parent="Cards"]
+margin_left = 295.0
+margin_top = 20.0
+margin_right = 328.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
+[node name="Foundation2" type="TextureButton" parent="Cards"]
+margin_left = 335.0
+margin_top = 20.0
+margin_right = 368.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
+[node name="Foundation3" type="TextureButton" parent="Cards"]
+margin_left = 375.0
+margin_top = 20.0
+margin_right = 408.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
+[node name="Foundation4" type="TextureButton" parent="Cards"]
+margin_left = 415.0
+margin_top = 20.0
+margin_right = 448.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( 42, 33 )
+texture_normal = ExtResource( 3 )
+
 [node name="CardDeck" type="Sprite" parent="."]
-position = Vector2( 255, 27 )
+position = Vector2( 255, 42 )
 texture = ExtResource( 2 )
 vframes = 2
 

@@ -12,6 +12,13 @@ func _ready():
 	pass
 
 func _process(delta):
+	check_selectable_cards()
+	pass
+
+# -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
+
+func check_selectable_cards():
+	
 	pass
 
 # -------------------------------- GAME START/ RESTART FUCNTIONS ----------------------------------------------
@@ -23,6 +30,7 @@ func _on_StartButton_pressed():
 	give_cards_start_pos()
 	# give randomized ids to cards and move 
 	give_cards_rand_pos()
+	yield(get_tree().create_timer(1.5), "timeout")
 	pass 
 
 func create_cards():
@@ -138,7 +146,7 @@ var casc_pos = [ [], [], [], [], [], [], [], [] ]
 var found_pos = []
 var fc_pos = []
 
-var card_start_pos = Vector2(240, 5)
+var card_start_pos = Vector2(240, 20)
 var top_left_casc_pos: Vector2 = Vector2(100, 100)
 var gap_x = 37
 var gap_y = 14
