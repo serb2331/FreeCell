@@ -35,8 +35,7 @@ class Card extends Control:
 	
 	func _process(delta):
 		# since i dont really know lerp for now
-		# self.rect_position = lerp(self.rect_position, pos, 0.5) 
-		self.rect_position = self.pos
+		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 50) 
 		pass
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------

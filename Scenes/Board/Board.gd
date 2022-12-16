@@ -9,7 +9,6 @@ func _ready():
 	create_positions()
 	# create the 52 cards and give them positions (c1 -> (0,0), c2 -> (1,0) ...)
 	create_cards()
-	give_cards_start_pos()
 	pass
 
 func _process(delta):
@@ -29,6 +28,8 @@ func _on_StartButton_pressed():
 func create_cards():
 	for i in range(52):
 		var card = Utils.Card.new(i)
+		card.pos = card_start_pos
+		card.rect_position = card_start_pos
 		cards.append(card)
 		$Cards.add_child(card)
 		card.add_child(card.texture_button)
@@ -137,7 +138,8 @@ var casc_pos = [ [], [], [], [], [], [], [], [] ]
 var found_pos = []
 var fc_pos = []
 
-var top_left_pos: Vector2 = Vector2(100, 100)
+var card_start_pos = Vector2(240, 5)
+var top_left_casc_pos: Vector2 = Vector2(100, 100)
 var gap_x = 37
 var gap_y = 14
 
@@ -145,7 +147,7 @@ func create_positions():
 	for i in range(8):
 		for j in range(18):
 			var pos: Vector2 = Vector2.ZERO
-			pos.x = top_left_pos.x + i * gap_x
-			pos.y = top_left_pos.y + j * gap_y
+			pos.x = top_left_casc_pos.x + i * gap_x
+			pos.y = top_left_casc_pos.y + j * gap_y
 			casc_pos[i].append(pos)
 	pass

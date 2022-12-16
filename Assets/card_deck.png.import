@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/card_deck_spaced.png-994967ac8494ac115d89e4cddb8acb83.stex"
+path="res://.import/card_deck.png-8e8346cac2551d9f6e5b87a8d5e46728.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/card_deck_spaced.png"
-dest_files=[ "res://.import/card_deck_spaced.png-994967ac8494ac115d89e4cddb8acb83.stex" ]
+source_file="res://Assets/card_deck.png"
+dest_files=[ "res://.import/card_deck.png-8e8346cac2551d9f6e5b87a8d5e46728.stex" ]
 
 [params]
 
