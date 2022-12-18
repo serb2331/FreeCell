@@ -29,6 +29,11 @@ func check_selectable_cards():
 				card.selectable = false
 	pass
 
+func _on_Card_press(card_id: int, is_card_selectable: bool):
+	print(card_id, is_card_selectable)
+	
+	pass
+
 # -------------------------------- GAME START/ RESTART FUCNTIONS ----------------------------------------------
 
 func _on_StartButton_pressed():
@@ -44,13 +49,19 @@ func _on_StartButton_pressed():
 	pass 
 
 func create_cards():
+	# create card objects
 	for i in range(52):
 		var card = Utils.Card.new(i)
+		# give them the normal start pos (behing deck sprite)
 		card.pos = card_start_pos
 		card.rect_position = card_start_pos
+		# add to cards Array
 		cards.append(card)
+		# add in scene tree so its visible
 		$Cards.add_child(card)
 		card.add_child(card.texture_button)
+		# connect the card_press signal (specific to the card class) 
+		card.connect("card_press", self, "_on_Card_press")
 	pass
 
 func give_cards_start_pos():
@@ -153,7 +164,7 @@ func create_set():
 
 # card sprite dimensions = (33, 45)
 var casc_pos = [ [], [], [], [], [], [], [], [] ]
-var found_pos = [Vector2(295, 20), Vector2(335, 20), Vector2(370, 20), Vector2()]
+var found_pos = [Vector2(295, 20), Vector2(335, 20), Vector2(375, 20), Vector2(415, 20)]
 var fc_pos = [Vector2(60, 20), Vector2(100, 20), Vector2(140, 20), Vector2(180, 20)]
 
 var card_start_pos = Vector2(240, 20)

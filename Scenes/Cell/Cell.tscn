@@ -1,17 +1,14 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scenes/Cell/Cell.gd" type="Script" id=1]
-[ext_resource path="res://Assets/card_deck_spaced.png" type="Texture" id=2]
-[ext_resource path="res://Shaders/Cell.gdshader" type="Shader" id=3]
-
-[sub_resource type="ShaderMaterial" id=1]
-shader = ExtResource( 3 )
+[ext_resource path="res://Assets/card_deck_spaced_bordered.png" type="Texture" id=2]
 
 [node name="Cell" type="TextureButton"]
-material = SubResource( 1 )
 margin_left = 7.0
 margin_top = 16.0
 margin_right = 498.0
 margin_bottom = 204.0
 texture_normal = ExtResource( 2 )
 script = ExtResource( 1 )
+
+[connection signal="pressed" from="." to="." method="_on_Cell_pressed"]

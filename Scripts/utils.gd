@@ -2,6 +2,8 @@ extends Node
 
 onready var DECK_SPRITESHEET = load("res://Assets/card_deck_bordered.tres")
 
+onready var INVERTCOLOR_SHADER = load("res://Shaders/InvertColorMaterial.tres")
+onready var EMPTY_SHADER = load("res://Shaders/EmptyMaterial.tres")
 # --------------------------- CARD CLASS ---------------------------------------------------------------------------
 
 #CARD NOTATION:
@@ -26,6 +28,8 @@ class Card extends Control:
 	# if is the top card in cascade or is in fc
 	var selectable: bool = false
 	
+	signal card_press
+	
 	# Constructor
 	func _init(id):
 		self.id = id
@@ -34,15 +38,24 @@ class Card extends Control:
 		
 		# set texture for the button for the specific frame in the spritesheet
 		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
+		
+		texture_button.connect("pressed", self, "_on_TButton_pressed")
 		pass
 	
 	func _process(delta):
-		# since i dont really know lerp for now
 		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 50) 
 		if selectable:
 			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", 53)
 		else:
 			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
+		pass
+	
+	func _on_TButton_pressed():
+		if texture_button.get_material() == Utils.INVERTCOLOR_SHADER:
+			texture_button.set_material(Utils.EMPTY_SHADER)
+		else:
+			texture_button.set_material(Utils.INVERTCOLOR_SHADER)
+		emit_signal("card_press", id, selectable)
 		pass
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------

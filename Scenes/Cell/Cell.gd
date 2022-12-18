@@ -1,10 +1,16 @@
 extends TextureButton
 
+var InvertColorShader = preload("res://Shaders/InvertColorMaterial.tres")
+
 func _ready():
-#	var card := Utils.Card.new(0)
-#	add_child(card)
-#	card.add_child(card.texture_button)
+	
 	pass
 
 func _process(delta):
+	pass
+
+
+func _on_Cell_pressed():
+	print("press")
+	set_material(InvertColorShader)
 	pass
