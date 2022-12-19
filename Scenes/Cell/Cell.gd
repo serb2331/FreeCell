@@ -3,7 +3,10 @@ extends TextureButton
 var InvertColorShader = preload("res://Shaders/InvertColorMaterial.tres")
 
 func _ready():
-	
+	print(get_children())
+	print()
+	move_child($Node, 2)
+	print(get_children())
 	pass
 
 func _process(delta):
