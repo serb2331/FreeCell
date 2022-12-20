@@ -44,8 +44,14 @@ func check_selectable_cards():
 				card.selectable = false
 	pass
 
-func _on_Card_press(card_id: int, is_card_selectable: bool):
-	print(card_id, is_card_selectable)
+func _on_Card_press(card_id: int):
+	var card = cards[card_id]
+	if card.selectable:
+		card.change_shader()
+	else:
+		var top_card_id = casc_id[card.casc_coord.x][casc_id[card.casc_coord.x].size() - 1]
+		var top_card_in_casc = cards[top_card_id]
+		top_card_in_casc.change_shader()
 	pass
 
 # -------------------------------- GAME STATE FUNCTIONS ----------------------------------------------
@@ -59,10 +65,8 @@ func arrange_card_children():
 	pass
 
 func _on_StartButton_pressed():
-	# on start clear the board of all ids
+	# on start clear the board of all ids + move all cards back to start
 	clear_board()
-	# move all cards back to start positions
-	give_cards_start_pos()
 	# randomize a new set of ids
 	randomize_set()
 	# give randomized ids to cards and move 
@@ -156,7 +160,7 @@ func create_cards():
 
 func give_cards_start_pos():
 	# give cards positions (c1 -> (0,0), c2 -> (1,0) ...)
-	for i in cards:		
+	for i in cards:
 		# change cascade coordonate 
 		i.casc_coord = Vector2(i.id % 8, i.id / 8)
 		
@@ -167,7 +171,7 @@ func give_cards_start_pos():
 func give_cards_rand_pos():
 	# 1 -take every id in casc_id,
 	# 2 -look for card with that id in cards
-	# 3 -give that card the pos from casc_pos
+	# 3 -give that card the pos from casc_pos and respective coordinate
 	for i in range(52):
 		#1
 		var id = casc_id[i % 8][i / 8]
@@ -175,6 +179,7 @@ func give_cards_rand_pos():
 		var card = cards[id]
 		#3
 		card.pos = casc_pos[i % 8][i / 8]
+		card.casc_coord = Vector2(i % 8, i / 8)
 	
 	pass
 

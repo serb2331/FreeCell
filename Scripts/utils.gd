@@ -20,7 +20,10 @@ class Card extends Control:
 	var texture_button: TextureButton = TextureButton.new()
 	
 	# cascade coordonates
-	var casc_coord 
+	# if card is in cascade -> coordinate = Vector2 from (0,0) to (17,17) or whatever
+	# if card is in freecell -> coordinate = Vector2 from (0, -1) to (3, -1)
+	# if card is in foundation -> coordinate = Vector2 from (0, -2) to (3, -2)
+	var casc_coord = Vector2.ZERO
 	
 	# position on screen
 	var pos = Vector2.ZERO
@@ -39,24 +42,29 @@ class Card extends Control:
 		# set texture for the button for the specific frame in the spritesheet
 		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		
-		texture_button.connect("pressed", self, "_on_TButton_pressed")
+		texture_button.connect("button_down", self, "_on_TButton_pressed")
 		pass
 	
 	func _process(delta):
+		# lerp so it doesnt move directly to pos
 		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 50) 
-		if selectable:
-			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", 53)
-		else:
-			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
+		# this was to check selectable cards
+#		if selectable:
+#			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", 53)
+#		else:
+#			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		pass
 	
 	func _on_TButton_pressed():
+		
+		emit_signal("card_press", id)
+		pass
+	
+	func change_shader():
 		if texture_button.get_material() == Utils.INVERTCOLOR_SHADER:
 			texture_button.set_material(Utils.EMPTY_SHADER)
 		else:
 			texture_button.set_material(Utils.INVERTCOLOR_SHADER)
-		emit_signal("card_press", id, selectable)
-		pass
 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
 
