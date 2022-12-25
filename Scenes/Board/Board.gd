@@ -16,13 +16,17 @@ var casc_pos = [ [], [], [], [], [], [], [], [] ]
 var found_pos = [Vector2(295, 20), Vector2(335, 20), Vector2(375, 20), Vector2(415, 20)]
 var fc_pos = [Vector2(60, 20), Vector2(100, 20), Vector2(140, 20), Vector2(180, 20)]
 
+var game_started: bool = false # if game is started
+var selected_card_id: int = -1 # holds the selected card's id
+var selected_card: Utils.Card = null # selected card
+
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
 
 func _ready():
 	set_process(false)
 	# create all possible card object positions
 	create_positions()
-	# create the 52 cards
+	# create the 52 cards and place behind card deck sprite
 	create_cards()
 	pass
 
@@ -34,6 +38,10 @@ func _process(delta):
 # -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
 
 func check_selectable_cards():
+	for i in cards:
+		if i.coord.x == -1 || casc_id[i.coord.x][casc_id[i.coord.x].size() - 1] == i.id:
+			i.selectable = true
+		
 	for i in range(8):
 		var casc_size = casc_id[i].size()
 		for j in range(casc_size):
@@ -45,13 +53,39 @@ func check_selectable_cards():
 	pass
 
 func _on_Card_press(card_id: int):
-	var card = cards[card_id]
-	if card.selectable:
-		card.change_shader()
-	else:
-		var top_card_id = casc_id[card.casc_coord.x][casc_id[card.casc_coord.x].size() - 1]
-		var top_card_in_casc = cards[top_card_id]
-		top_card_in_casc.change_shader()
+	# this checks if game has started, we dont want to select cards before dealing the game
+	if game_started:
+		# the pressed card
+		var pressed_card = cards[card_id]
+		# the card we consider:
+		var card: Utils.Card
+		# if the card pressed is the top one in the cascade (if its selectable)
+		if pressed_card.selectable:
+			card = pressed_card # the card is the pressed card
+		# if it isn't the top card in cascade
+		else:
+			# take the top card and consider that
+			card = cards[casc_id[pressed_card.coord.x][casc_id[pressed_card.coord.x].size() - 1]]
+		# if we dont have a selected card, select the pressed card
+		if selected_card_id == -1:
+			card.change_shader()
+			selected_card_id = card.id
+			selected_card = card
+		# if we have a selected card...
+		else:
+			# ...and its the same as the one pressed, delesect it
+			if selected_card_id == card.id:
+				selected_card.change_shader()
+				selected_card_id = -1
+			# ...and it differs from the selected one, check for compatibility for movement
+			# and move accordingly
+			else:
+#				if moveable -> move
+#				else -> deselect
+				selected_card.change_shader()
+				selected_card = card
+				selected_card_id = card.id
+				selected_card.change_shader()
 	pass
 
 # -------------------------------- GAME STATE FUNCTIONS ----------------------------------------------
@@ -65,6 +99,7 @@ func arrange_card_children():
 	pass
 
 func _on_StartButton_pressed():
+	game_started = false
 	# on start clear the board of all ids + move all cards back to start
 	clear_board()
 	# randomize a new set of ids
@@ -74,6 +109,7 @@ func _on_StartButton_pressed():
 	# wait for cards to go to their positions
 	yield(get_tree().create_timer(1.5), "timeout")
 	set_process(true)
+	game_started = true
 	pass 
 
 # ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
@@ -162,7 +198,7 @@ func give_cards_start_pos():
 	# give cards positions (c1 -> (0,0), c2 -> (1,0) ...)
 	for i in cards:
 		# change cascade coordonate 
-		i.casc_coord = Vector2(i.id % 8, i.id / 8)
+		i.coord = Vector2(i.id % 8, i.id / 8)
 		
 		# change pos
 		i.pos = casc_pos[i.id % 8][i.id / 8]
@@ -179,7 +215,7 @@ func give_cards_rand_pos():
 		var card = cards[id]
 		#3
 		card.pos = casc_pos[i % 8][i / 8]
-		card.casc_coord = Vector2(i % 8, i / 8)
+		card.coord = Vector2(i % 8, i / 8)
 	
 	pass
 
@@ -193,4 +229,10 @@ func clear_board():
 	fc_id.clear()
 	fc_id.append_array([ 52, 52, 52, 52])
 	
+	if selected_card_id != -1:
+		selected_card.change_shader()
+		selected_card_id = -1
+		selected_card = null
+#	for i in cards:
+#		i.pos = card_start_pos
 	pass

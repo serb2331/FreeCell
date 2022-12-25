@@ -21,9 +21,9 @@ class Card extends Control:
 	
 	# cascade coordonates
 	# if card is in cascade -> coordinate = Vector2 from (0,0) to (17,17) or whatever
-	# if card is in freecell -> coordinate = Vector2 from (0, -1) to (3, -1)
-	# if card is in foundation -> coordinate = Vector2 from (0, -2) to (3, -2)
-	var casc_coord = Vector2.ZERO
+	# if card is in freecell -> coordinate = Vector2 from (-1, 0) to (-1, 3)
+	# if card is in foundation -> coordinate = Vector2 from (-2, 0) to (-2, 0)
+	var coord = Vector2.ZERO
 	
 	# position on screen
 	var pos = Vector2.ZERO
