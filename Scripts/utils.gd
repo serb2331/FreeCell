@@ -19,18 +19,14 @@ class Card extends Control:
 	# texture_button property for the card texture as well as clicking capabilities
 	var texture_button: TextureButton = TextureButton.new()
 	
-	# cascade coordonates
 	# if card is in cascade -> coordinate = Vector2 from (0,0) to (17,17) or whatever
 	# if card is in freecell -> coordinate = Vector2 from (-1, 0) to (-1, 3)
-	# if card is in foundation -> coordinate = Vector2 from (-2, 0) to (-2, 0)
+	# if card is in foundation -> coordinate = Vector2 from (-2, 0) to (-2, 3)
 	var coord = Vector2.ZERO
 	
 	# position on screen
 	var pos = Vector2.ZERO
-	
-	# if is the top card in cascade or is in fc
-	var selectable: bool = false
-	
+
 	signal card_press
 	
 	# Constructor
@@ -48,11 +44,6 @@ class Card extends Control:
 	func _process(delta):
 		# lerp so it doesnt move directly to pos
 		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 50) 
-		# this was to check selectable cards
-#		if selectable:
-#			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", 53)
-#		else:
-#			texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		pass
 	
 	func _on_TButton_pressed():
@@ -65,7 +56,8 @@ class Card extends Control:
 			texture_button.set_material(Utils.EMPTY_SHADER)
 		else:
 			texture_button.set_material(Utils.INVERTCOLOR_SHADER)
-
+		pass
+ 
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
 
 func _ready():
