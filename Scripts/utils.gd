@@ -12,9 +12,9 @@ onready var EMPTY_SHADER = load("res://Shaders/EmptyMaterial.tres")
 #	- foundation = pile of the solved cards
 
 class Card extends Control:
-	var id          # (from 0 to 51)
-	var card_color  # (from 0 to 3)
-	var card_number # (from 0 to 12)
+	var id     # (from 0 to 51)
+	var color  # (from 0 to 3)
+	var number # (from 0 to 12)
 	
 	# texture_button property for the card texture as well as clicking capabilities
 	var texture_button: TextureButton = TextureButton.new()
@@ -32,8 +32,8 @@ class Card extends Control:
 	# Constructor
 	func _init(id):
 		self.id = id
-		self.card_color = id / 13
-		self.card_number = id % 13
+		self.color = id / 13
+		self.number = id % 13
 		
 		# set texture for the button for the specific frame in the spritesheet
 		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
