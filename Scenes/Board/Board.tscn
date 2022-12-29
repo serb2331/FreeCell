@@ -25,9 +25,7 @@ margin_top = -50.0
 margin_right = 50.0
 text = "Start"
 
-[node name="Cards" type="YSort" parent="."]
-
-[node name="CascadeBottom1" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom1" type="TextureButton" parent="."]
 visible = false
 margin_left = 100.0
 margin_top = 75.0
@@ -35,7 +33,7 @@ margin_right = 133.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
 
-[node name="CascadeBottom2" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom2" type="TextureButton" parent="."]
 visible = false
 margin_left = 137.0
 margin_top = 75.0
@@ -43,7 +41,7 @@ margin_right = 170.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
 
-[node name="CascadeBottom3" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom3" type="TextureButton" parent="."]
 visible = false
 margin_left = 174.0
 margin_top = 75.0
@@ -51,7 +49,7 @@ margin_right = 207.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
 
-[node name="CascadeBottom4" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom4" type="TextureButton" parent="."]
 visible = false
 margin_left = 211.0
 margin_top = 75.0
@@ -59,7 +57,7 @@ margin_right = 244.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
 
-[node name="CascadeBottom5" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom5" type="TextureButton" parent="."]
 visible = false
 margin_left = 248.0
 margin_top = 75.0
@@ -67,7 +65,7 @@ margin_right = 281.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
 
-[node name="CascadeBottom6" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom6" type="TextureButton" parent="."]
 visible = false
 margin_left = 285.0
 margin_top = 75.0
@@ -75,7 +73,7 @@ margin_right = 318.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
 
-[node name="CascadeBottom7" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom7" type="TextureButton" parent="."]
 visible = false
 margin_left = 322.0
 margin_top = 75.0
@@ -83,13 +81,15 @@ margin_right = 355.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
 
-[node name="CascadeBottom8" type="TextureButton" parent="Cards"]
+[node name="CascadeBottom8" type="TextureButton" parent="."]
 visible = false
 margin_left = 359.0
 margin_top = 75.0
 margin_right = 392.0
 margin_bottom = 120.0
 texture_normal = ExtResource( 3 )
+
+[node name="Cards" type="YSort" parent="."]
 
 [node name="Foundation1" type="TextureButton" parent="."]
 show_behind_parent = true
@@ -166,14 +166,14 @@ vframes = 2
 
 [connection signal="button_down" from="Background" to="." method="_on_Background_press"]
 [connection signal="pressed" from="StartButton" to="." method="_on_StartButton_pressed"]
-[connection signal="button_down" from="Cards/CascadeBottom1" to="." method="_on_CascadeBottom_press" binds= [ 0 ]]
-[connection signal="button_down" from="Cards/CascadeBottom2" to="." method="_on_CascadeBottom_press" binds= [ 1 ]]
-[connection signal="button_down" from="Cards/CascadeBottom3" to="." method="_on_CascadeBottom_press" binds= [ 2 ]]
-[connection signal="button_down" from="Cards/CascadeBottom4" to="." method="_on_CascadeBottom_press" binds= [ 3 ]]
-[connection signal="button_down" from="Cards/CascadeBottom5" to="." method="_on_CascadeBottom_press" binds= [ 4 ]]
-[connection signal="button_down" from="Cards/CascadeBottom6" to="." method="_on_CascadeBottom_press" binds= [ 5 ]]
-[connection signal="button_down" from="Cards/CascadeBottom7" to="." method="_on_CascadeBottom_press" binds= [ 6 ]]
-[connection signal="button_down" from="Cards/CascadeBottom8" to="." method="_on_CascadeBottom_press" binds= [ 7 ]]
+[connection signal="button_down" from="CascadeBottom1" to="." method="_on_CascadeBottom_press" binds= [ 0 ]]
+[connection signal="button_down" from="CascadeBottom2" to="." method="_on_CascadeBottom_press" binds= [ 1 ]]
+[connection signal="button_down" from="CascadeBottom3" to="." method="_on_CascadeBottom_press" binds= [ 2 ]]
+[connection signal="button_down" from="CascadeBottom4" to="." method="_on_CascadeBottom_press" binds= [ 3 ]]
+[connection signal="button_down" from="CascadeBottom5" to="." method="_on_CascadeBottom_press" binds= [ 4 ]]
+[connection signal="button_down" from="CascadeBottom6" to="." method="_on_CascadeBottom_press" binds= [ 5 ]]
+[connection signal="button_down" from="CascadeBottom7" to="." method="_on_CascadeBottom_press" binds= [ 6 ]]
+[connection signal="button_down" from="CascadeBottom8" to="." method="_on_CascadeBottom_press" binds= [ 7 ]]
 [connection signal="button_down" from="Foundation1" to="." method="_on_Foundation_press" binds= [ 0 ]]
 [connection signal="button_down" from="Foundation2" to="." method="_on_Foundation_press" binds= [ 1 ]]
 [connection signal="button_down" from="Foundation3" to="." method="_on_Foundation_press" binds= [ 2 ]]

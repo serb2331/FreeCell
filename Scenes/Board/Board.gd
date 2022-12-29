@@ -7,6 +7,8 @@ onready var FoundationSpriteSheet: SpriteFrames = load("res://Assets/foundation.
 # holds card objects
 var cards: Array = []
 
+var doubleclick = false
+
 # cascade Array of Arrays for memorizing card order for each cascade(column)
 var casc_id: Array = [ [], [], [], [], [], [], [], [] ]
 # foundations Array of Arrays to hold solved cards (starts empty)
@@ -35,7 +37,17 @@ func _ready():
 	pass
 
 func _process(delta):
+	print(doubleclick)
 	pass
+
+#func _input(event):
+#	if event is InputEventMouseButton:
+#		if event.doubleclick == true:
+#			doubleclick = true
+#			print("clicked double")
+#	else:
+#		doubleclick = false
+#	pass
 
 # -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
 
@@ -236,7 +248,7 @@ func _on_movement():
 func arrange_card_children():
 	# make cascade cards be layered so that the top cards in each cascade
 	# are the last children of $Cards
-	# (will be behing Foundation* and after FreeCell*)
+	# (will be behind Foundation* and after FreeCell*)
 	# cards that are in free cells and foundation will be between them in scene tree
 	# so they dont need special cases (THEORETICALLY)
 	for i in range(18):
@@ -244,11 +256,19 @@ func arrange_card_children():
 			if casc_id[j][i] != null:
 				var card = cards[casc_id[j][i]]
 				$Cards.move_child(card, $Cards.get_child_count() - 1)
+			else:
+				break
+	# we also need to sort foundation cards so that the top card appears
+	# and not another card in the foundation
+	for i in range(4):
+		for j in range(found_id[i].size()):
+			var foundation_card = cards[found_id[i][j]]
+			$Cards.move_child(foundation_card, j)
 	pass
  
 func _on_StartButton_pressed():
 	for i in range(8):
-		var cascade_bottom = get_node("Cards/CascadeBottom" + String(i + 1))
+		var cascade_bottom = get_node("CascadeBottom" + String(i + 1))
 		cascade_bottom.hide()
 	game_started = false
 	# on start clear the board of all ids
@@ -263,7 +283,7 @@ func _on_StartButton_pressed():
 	# wait for cards to go to their positions
 	yield(get_tree().create_timer(1.0), "timeout")
 	for i in range(8):
-		var cascade_bottom = get_node("Cards/CascadeBottom" + String(i + 1))
+		var cascade_bottom = get_node("CascadeBottom" + String(i + 1))
 		cascade_bottom.show()
 	set_process(true)
 	game_started = true
@@ -345,9 +365,8 @@ func create_cards():
 		cards.append(card)
 		# add in scene tree so its visible
 		$Cards.add_child(card)
-		$Cards.move_child(card, 8)
 		card.add_child(card.texture_button)
-		card.mouse_filter = MOUSE_FILTER_STOP 
+#		card.mouse_filter = MOUSE_FILTER_STOP 
 		# connect the card_press signal (specific to the card class) 
 		card.connect("card_press", self, "_on_Card_press")
 	pass
@@ -356,7 +375,7 @@ func create_cards():
 # based on if there are cards in the respective foundation and cascade
 func foundations_and_cascadebottoms():
 	for i in range(8):
-		var cascade_bottom = get_node("Cards/CascadeBottom" + String(i + 1))
+		var cascade_bottom = get_node("CascadeBottom" + String(i + 1))
 		if casc_id[i][0] != null:
 			cascade_bottom.disabled = true
 		else:
