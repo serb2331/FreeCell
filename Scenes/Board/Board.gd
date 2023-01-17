@@ -7,8 +7,6 @@ onready var FoundationSpriteSheet: SpriteFrames = load("res://Assets/foundation.
 # holds card objects
 var cards: Array = []
 
-var doubleclick = false
-
 # cascade Array of Arrays for memorizing card order for each cascade(column)
 var casc_id: Array = [ [], [], [], [], [], [], [], [] ]
 # foundations Array of Arrays to hold solved cards (starts empty)
@@ -37,22 +35,26 @@ func _ready():
 	pass
 
 func _process(delta):
-	print(doubleclick)
 	pass
 
 #func _input(event):
-#	if event is InputEventMouseButton:
-#		if event.doubleclick == true:
-#			doubleclick = true
-#			print("clicked double")
-#	else:
-#		doubleclick = false
 #	pass
+
+func print_card_ids():
+	printraw("\n")
+	for i in range(8):
+		for j in range(10):
+			if casc_id[i][j] == null:
+				printraw("(empty) ")
+			else:
+				var card = cards[casc_id[i][j]]
+				printraw("(", card.color, " ", card.number, ") ")
+		printraw("\n")
+	pass
 
 # -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
 
 func move_card_to_coordinate(card, to_coord):
-	print("movement_call to coordinate ", to_coord)
 	# if we move card to free cell
 	if to_coord.x == -1:
 		# if we move card from free cell
@@ -110,6 +112,7 @@ func move_card_to_coordinate(card, to_coord):
 		
 		# move card texture
 		card.pos = casc_pos[card.coord.x][card.coord.y]
+	yield(get_tree().create_timer(0.2),"timeout")
 	_on_movement()
 	pass
 
@@ -124,14 +127,61 @@ func deselect_card():
 		selected_card = null
 	pass
 
+# only check for only min + 1 value cards
+func check_for_auto_move():
+	# get minimum number in foundation
+	var min_found_num = 100000
+	for i in range(4):
+		if found_id[i].size() > 0:
+			if found_id[i][found_id[i].size() - 1] % 13 < min_found_num:
+				min_found_num = found_id[i][found_id[i].size() - 1] % 13
+		else:
+			min_found_num = -1
+	print(min_found_num)
+	# card to be checked for auto movement
+	# will be the top cards in each cascade and free cell
+	var card_check
+	for i in range(8):
+		if casc_id[i][0] != null:
+			for j in range(casc_id[i].size()):
+					if  casc_id[i][j] != null && casc_id[i][j + 1] == null:
+						card_check = cards[casc_id[i][j]]
+						break
+			
+			# foundation top card number of respective color
+			var found_top_card_num
+			if found_id[card_check.color].size() == 0:
+				found_top_card_num = -1
+			else:
+				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
+			if card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num:
+				move_card_to_coordinate(card_check, Vector2(-2, card_check.color))
+				return
+			
+	for i in range(4):
+		if fc_id[i] != null:
+			card_check = cards[fc_id[i]]
+			
+			# foundation top card number of respective color
+			var found_top_card_num
+			if found_id[card_check.color].size() == 0:
+				found_top_card_num = -1
+			else:
+				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
+			if card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num:
+				move_card_to_coordinate(card_check, Vector2(-2, card_check.color))
+				return
+			
+	pass
+
+# (CALLS FOR CARD PRESSES IN FREECELL AND FOUNDATION TOPS)
 func _on_Card_press(card_id: int):
 	# print("card ", cards[card_id].coord)
 	# the pressed card
 	var pressed_card = cards[card_id]
 	
 	# this checks if game has started, we dont want to select cards before dealing the set
-	# and that the card isn't in a foundation
-	if game_started && pressed_card.coord.x != -2:
+	if game_started:
 		# the card we consider:
 		var card: Utils.Card
 		# if the pressed card is in a cascade
@@ -143,33 +193,48 @@ func _on_Card_press(card_id: int):
 				if  casc_id[pressed_card.coord.x][i] != null && casc_id[pressed_card.coord.x][i + 1] == null:
 					card = cards[casc_id[pressed_card.coord.x][i]]
 					break
-		# if the pressed card is in a free cell
+		# if the pressed card is in a free cell or a foundation
 		else:
 			card = pressed_card
 		
-		# if we have a selected card...
-		if selected_card != null:
-			# ...and its the same as the one pressed...
-			if selected_card == card:
-				# ...add to first available free cell
-				for i in range(4):
-					if fc_id[i] == null:
-						move_card_to_coordinate(selected_card, Vector2(-1, i))
-						break
+		# if card is in foundation
+		if card.coord.x == -2:
+			# if we have a selected card
+			if selected_card != null:
+				if selected_card.color == card.color && selected_card.number == card.number + 1:
+					move_card_to_coordinate(selected_card, Vector2(-2, card.color))
 				deselect_card()
-			# ...and it differs from the selected one
+		# if card is in free cell
+		elif card.coord.x == -1:
+			if selected_card == null:
+				select_card(card)
 			else:
-				# ...check for compatibility for movement and move accordingly
-				if selected_card.color % 2 != card.color % 2 && selected_card.number == card.number - 1:
-					move_card_to_coordinate(selected_card, Vector2(card.coord.x, card.coord.y + 1))
 				deselect_card()
-		# if we dont have a selected card...
+				select_card(card)
+		# if card is in cascade
 		else:
-			# ...select the pressed card
-			select_card(card)
+			if selected_card == null:
+				select_card(card)
+			else: # if we have a selected card
+				# ...and its the same as the one pressed...
+				if selected_card == card:
+					# ...add to first available free cell
+					for i in range(4):
+						if fc_id[i] == null:
+							move_card_to_coordinate(selected_card, Vector2(-1, i))
+							break
+					deselect_card()
+				else:
+					# ...check for compatibility for movement and move accordingly
+					if selected_card.color % 2 != card.color % 2 && selected_card.number == card.number - 1:
+						move_card_to_coordinate(selected_card, Vector2(card.coord.x, card.coord.y + 1))
+						deselect_card()
+					else:
+						deselect_card()
+						select_card(card)
 	pass
 
-# this function is called when pressing a freecell
+# (ONLY WHEN PRESSING THE EMPTY FREECELL, CARDS IN FREECELL CALL CARD_PRESS) 
 # freecell holds which free cell has been pressed
 func _on_FreeCell_press(freecell):
 	# only if game started
@@ -195,8 +260,7 @@ func _on_FreeCell_press(freecell):
 				pass
 	pass
 
-# this function calls for every time a foundation is pressed
-# its called regardless if it has a card in it or not
+# (ONLY WHEN PRESSING THE EMPTY FOUNDATION, CARDS IN FOUNDATION CALL CARD_PRESS) 
 # foundation holds which foundation was pressed
 func _on_Foundation_press(foundation):
 	# Foundation colors are in order:
@@ -208,7 +272,7 @@ func _on_Foundation_press(foundation):
 	# check if we have selected card and can be moved to foundation
 	#  -> move card to foundation
 	if selected_card != null:
-		if selected_card.number == found_id[foundation].size() && selected_card.color == foundation:
+		if selected_card.color == foundation && selected_card.number == 0:
 			move_card_to_coordinate(selected_card, Vector2(-2, foundation))
 	deselect_card()
 	pass # Replace with function body.
@@ -227,23 +291,23 @@ func _on_Background_press():
 	deselect_card()
 	pass
 
-# -------------------------------- GAME STATE FUNCTIONS -----------------------------------------
-
 # this function:
 #  -arranges the card children in the scene tree because of an issue
 #   regarding the layering of TextureButtons
-# (the TextureButton that is last in the children of $Cards will have hover priority)
-#  -makes the CascadeButton TextureButtons enabled or disabled
+# (the TextureButton that is last in the children of $Cards will have hover and render prio)
+#  -makes the CascadeButton texture btn enabled or disabled
 #   based on if there are cards in the cascade
-#  -shows or doesnt show the texture of foundation buttons
-#   based on if there are cards in the foundation
 func _on_movement():
 	
 	arrange_card_children()
 	
-	foundations_and_cascadebottoms()
+	print_card_ids()
+	
+	check_for_auto_move()
 	
 	pass
+
+# -------------------------------- GAME STATE FUNCTIONS -----------------------------------------
 
 func arrange_card_children():
 	# make cascade cards be layered so that the top cards in each cascade
@@ -267,9 +331,7 @@ func arrange_card_children():
 	pass
  
 func _on_StartButton_pressed():
-	for i in range(8):
-		var cascade_bottom = get_node("CascadeBottom" + String(i + 1))
-		cascade_bottom.hide()
+	move_child($CardDeck, get_child_count())
 	game_started = false
 	# on start clear the board of all ids
 	clear_board()
@@ -281,12 +343,11 @@ func _on_StartButton_pressed():
 	give_cards_randomized_pos()
 	arrange_card_children()
 	# wait for cards to go to their positions
-	yield(get_tree().create_timer(1.0), "timeout")
-	for i in range(8):
-		var cascade_bottom = get_node("CascadeBottom" + String(i + 1))
-		cascade_bottom.show()
-	set_process(true)
+	yield(get_tree().create_timer(0.75), "timeout")
+	move_child($CardDeck, 1)
 	game_started = true
+	set_process(true)
+	check_for_auto_move()
 	pass 
 
 # ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
@@ -340,7 +401,7 @@ func randomize_set():
 
 # card sprite dimensions = (33, 45)
 
-var card_start_pos = Vector2(240, 20)
+var card_start_pos = Vector2(240, 19)
 var top_left_casc_pos: Vector2 = Vector2(100, 75)
 var gap_x = 37
 var gap_y = 14
@@ -369,23 +430,6 @@ func create_cards():
 #		card.mouse_filter = MOUSE_FILTER_STOP 
 		# connect the card_press signal (specific to the card class) 
 		card.connect("card_press", self, "_on_Card_press")
-	pass
-
-# shows or hides foundation and cascade_bottom buttons
-# based on if there are cards in the respective foundation and cascade
-func foundations_and_cascadebottoms():
-	for i in range(8):
-		var cascade_bottom = get_node("CascadeBottom" + String(i + 1))
-		if casc_id[i][0] != null:
-			cascade_bottom.disabled = true
-		else:
-			cascade_bottom.disabled = false
-	for i in range(4):
-		var foundation = get_node("Foundation" + String(i + 1))
-		if found_id[i].size() > 0:
-			foundation.texture_normal = EmptyCardSprite
-		else:
-			foundation.texture_normal = FoundationSpriteSheet.get_frame("default", i)
 	pass
 
 func give_cards_start_pos():
@@ -423,8 +467,6 @@ func clear_board():
 	
 	fc_id.clear()
 	fc_id.append_array([null, null, null, null])
-	
-	foundations_and_cascadebottoms()
 	
 	if selected_card != null:
 		selected_card.change_shader()

@@ -3,7 +3,6 @@ extends Node
 onready var DECK_SPRITESHEET = load("res://Assets/card_deck_bordered.tres")
 
 onready var INVERTCOLOR_SHADER = load("res://Shaders/InvertColorMaterial.tres")
-onready var EMPTY_SHADER = load("res://Shaders/EmptyMaterial.tres")
 # --------------------------- CARD CLASS ---------------------------------------------------------------------------
 
 #CARD NOTATION:
@@ -43,7 +42,7 @@ class Card extends Control:
 	
 	func _process(delta):
 		# lerp so it doesnt move directly to pos
-		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 50) 
+		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 90) 
 		pass
 	
 	func _on_TButton_pressed():
@@ -53,7 +52,7 @@ class Card extends Control:
 	
 	func change_shader():
 		if texture_button.get_material() == Utils.INVERTCOLOR_SHADER:
-			texture_button.set_material(Utils.EMPTY_SHADER)
+			texture_button.set_material(null)
 		else:
 			texture_button.set_material(Utils.INVERTCOLOR_SHADER)
 		pass

@@ -1,0 +1,93 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Assets/Fonts/AlagardTitle.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Assets/Fonts/AlagardText.tres" type="DynamicFont" id=2]
+[ext_resource path="res://Scenes/MainMenu/MainMenu.gd" type="Script" id=3]
+[ext_resource path="res://Scenes/MainMenu/Indicator2.gd" type="Script" id=4]
+[ext_resource path="res://Scenes/MainMenu/Indicator1.gd" type="Script" id=5]
+[ext_resource path="res://Assets/background.png" type="Texture" id=6]
+
+[node name="MainMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 3 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 256, 150 )
+scale = Vector2( 3, 3 )
+texture = ExtResource( 6 )
+
+[node name="Title" type="RichTextLabel" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -80.0
+margin_top = -130.0
+margin_right = 88.0
+margin_bottom = -63.0
+custom_fonts/normal_font = ExtResource( 1 )
+bbcode_enabled = true
+bbcode_text = "[wave amp=20 freq=5][center] FreeCell[/center][/wave]"
+text = " FreeCell"
+
+[node name="Indicator1" type="RichTextLabel" parent="."]
+visible = false
+margin_left = 162.0
+margin_top = 146.0
+margin_right = 183.0
+margin_bottom = 163.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_fonts/normal_font = ExtResource( 2 )
+text = " ->"
+script = ExtResource( 5 )
+
+[node name="StartButton" type="Button" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -72.0
+margin_top = -12.0
+margin_right = -23.0
+margin_bottom = 12.0
+rect_scale = Vector2( 1.8, 1.8 )
+focus_mode = 0
+custom_fonts/font = ExtResource( 2 )
+enabled_focus_mode = 0
+text = "Start"
+flat = true
+
+[node name="Indicator2" type="RichTextLabel" parent="."]
+visible = false
+margin_left = 162.0
+margin_top = 196.0
+margin_right = 183.0
+margin_bottom = 213.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_fonts/normal_font = ExtResource( 2 )
+text = " ->"
+script = ExtResource( 4 )
+
+[node name="ExitButton" type="Button" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -72.0
+margin_top = 38.0
+margin_right = -28.0
+margin_bottom = 62.0
+rect_scale = Vector2( 1.8, 1.8 )
+focus_mode = 0
+custom_fonts/font = ExtResource( 2 )
+enabled_focus_mode = 0
+text = "Exit"
+flat = true
+
+[connection signal="mouse_entered" from="StartButton" to="Indicator1" method="_on_StartButton_mouse_entered"]
+[connection signal="mouse_exited" from="StartButton" to="Indicator1" method="_on_StartButton_mouse_exited"]
+[connection signal="pressed" from="StartButton" to="." method="_on_StartButton_pressed"]
+[connection signal="mouse_entered" from="ExitButton" to="Indicator2" method="_on_ExitButton_mouse_entered"]
+[connection signal="mouse_exited" from="ExitButton" to="Indicator2" method="_on_ExitButton_mouse_exited"]
+[connection signal="pressed" from="ExitButton" to="." method="_on_ExitButton_pressed"]
