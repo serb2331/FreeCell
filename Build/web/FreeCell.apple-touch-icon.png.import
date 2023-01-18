@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/FreeCell.apple-touch-icon.png-f1d05104a18d497cdd5886f8d132d307.stex"
+path="res://.import/FreeCell.apple-touch-icon.png-6046b90c6e8e9874ae29a39513da5665.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Build/web/FreeCell.apple-touch-icon.png"
-dest_files=[ "res://.import/FreeCell.apple-touch-icon.png-f1d05104a18d497cdd5886f8d132d307.stex" ]
+source_file="res://build/web/FreeCell.apple-touch-icon.png"
+dest_files=[ "res://.import/FreeCell.apple-touch-icon.png-6046b90c6e8e9874ae29a39513da5665.stex" ]
 
 [params]
 

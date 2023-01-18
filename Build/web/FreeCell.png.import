@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/FreeCell.png-379ff5b5988aee2274fe2e88b63b42ee.stex"
+path="res://.import/FreeCell.png-d75ebb82e9d38155add4bef498759259.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Build/web/FreeCell.png"
-dest_files=[ "res://.import/FreeCell.png-379ff5b5988aee2274fe2e88b63b42ee.stex" ]
+source_file="res://build/web/FreeCell.png"
+dest_files=[ "res://.import/FreeCell.png-d75ebb82e9d38155add4bef498759259.stex" ]
 
 [params]
 
