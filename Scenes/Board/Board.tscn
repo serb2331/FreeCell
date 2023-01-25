@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Scenes/Board/Board.gd" type="Script" id=1]
 [ext_resource path="res://Assets/card_deck.png" type="Texture" id=2]
 [ext_resource path="res://Assets/empty_card.png" type="Texture" id=3]
 [ext_resource path="res://Assets/background.png" type="Texture" id=4]
+[ext_resource path="res://Assets/Fonts/AlagardBoard.tres" type="DynamicFont" id=5]
+[ext_resource path="res://Assets/king_sprite.png" type="Texture" id=6]
+[ext_resource path="res://Assets/deal_cards_icon.png" type="Texture" id=7]
+[ext_resource path="res://Assets/restart_icon.png" type="Texture" id=8]
 
 [node name="Board" type="Control"]
 margin_right = 512.0
@@ -18,16 +22,15 @@ texture = ExtResource( 4 )
 [node name="Background" type="Button" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = 78.0
+margin_top = 69.0
 focus_mode = 0
 flat = true
 
-[node name="StartButton" type="Button" parent="."]
-anchor_top = 1.0
-anchor_bottom = 1.0
-margin_top = -50.0
-margin_right = 50.0
-text = "Start"
+[node name="KingSprite" type="Sprite" parent="."]
+visible = false
+position = Vector2( 385, 200 )
+scale = Vector2( 2, 2 )
+texture = ExtResource( 6 )
 
 [node name="CascadeBottom1" type="TextureButton" parent="."]
 margin_left = 100.0
@@ -149,8 +152,51 @@ scale = Vector2( 1.1, 1.1 )
 texture = ExtResource( 2 )
 vframes = 2
 
+[node name="DealCardsButton" type="TextureButton" parent="."]
+margin_left = 11.0
+margin_top = 240.0
+margin_right = 82.0
+margin_bottom = 307.0
+rect_scale = Vector2( 0.75, 0.75 )
+
+[node name="StartLbl" type="RichTextLabel" parent="DealCardsButton"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 3.0
+margin_top = -62.0
+margin_right = 73.0
+margin_bottom = -44.0
+custom_fonts/normal_font = ExtResource( 5 )
+text = "Deal Cards"
+
+[node name="Sprite" type="Sprite" parent="DealCardsButton"]
+position = Vector2( 36, 44 )
+scale = Vector2( 1.2, 1.2 )
+texture = ExtResource( 7 )
+
+[node name="RestartButton" type="TextureButton" parent="."]
+margin_left = 11.0
+margin_top = 182.0
+margin_right = 82.0
+margin_bottom = 249.0
+rect_scale = Vector2( 0.75, 0.75 )
+
+[node name="RestartLbl" type="RichTextLabel" parent="RestartButton"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 13.3333
+margin_top = -60.3333
+margin_right = 63.3333
+margin_bottom = -42.3333
+custom_fonts/normal_font = ExtResource( 5 )
+text = "Restart"
+
+[node name="Sprite" type="Sprite" parent="RestartButton"]
+position = Vector2( 36, 48 )
+scale = Vector2( 1.3, 1.3 )
+texture = ExtResource( 8 )
+
 [connection signal="button_down" from="Background" to="." method="_on_Background_press"]
-[connection signal="pressed" from="StartButton" to="." method="_on_StartButton_pressed"]
 [connection signal="button_down" from="CascadeBottom1" to="." method="_on_CascadeBottom_press" binds= [ 0 ]]
 [connection signal="button_down" from="CascadeBottom2" to="." method="_on_CascadeBottom_press" binds= [ 1 ]]
 [connection signal="button_down" from="CascadeBottom3" to="." method="_on_CascadeBottom_press" binds= [ 2 ]]
@@ -167,3 +213,5 @@ vframes = 2
 [connection signal="button_down" from="FreeCell2" to="." method="_on_FreeCell_press" binds= [ 1 ]]
 [connection signal="button_down" from="FreeCell3" to="." method="_on_FreeCell_press" binds= [ 2 ]]
 [connection signal="button_down" from="FreeCell4" to="." method="_on_FreeCell_press" binds= [ 3 ]]
+[connection signal="pressed" from="DealCardsButton" to="." method="_on_DealButton_pressed"]
+[connection signal="pressed" from="RestartButton" to="." method="_on_Restart_pressed"]

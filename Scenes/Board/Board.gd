@@ -37,21 +37,6 @@ func _ready():
 func _process(delta):
 	pass
 
-#func _input(event):
-#	pass
-
-func print_card_ids():
-	printraw("\n")
-	for i in range(8):
-		for j in range(10):
-			if casc_id[i][j] == null:
-				printraw("(empty) ")
-			else:
-				var card = cards[casc_id[i][j]]
-				printraw("(", card.color, " ", card.number, ") ")
-		printraw("\n")
-	pass
-
 # -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
 
 func move_card_to_coordinate(card, to_coord):
@@ -112,7 +97,7 @@ func move_card_to_coordinate(card, to_coord):
 		
 		# move card texture
 		card.pos = casc_pos[card.coord.x][card.coord.y]
-	yield(get_tree().create_timer(0.2),"timeout")
+	yield(get_tree().create_timer(0.05),"timeout")
 	_on_movement()
 	pass
 
@@ -137,7 +122,6 @@ func check_for_auto_move():
 				min_found_num = found_id[i][found_id[i].size() - 1] % 13
 		else:
 			min_found_num = -1
-	print(min_found_num)
 	# card to be checked for auto movement
 	# will be the top cards in each cascade and free cell
 	var card_check
@@ -301,13 +285,21 @@ func _on_movement():
 	
 	arrange_card_children()
 	
-	print_card_ids()
+	check_game_finish()
 	
 	check_for_auto_move()
 	
 	pass
 
 # -------------------------------- GAME STATE FUNCTIONS -----------------------------------------
+
+func check_game_finish():
+	if found_id[0].size() == 13 && found_id[1].size() == 13 && found_id[2].size() == 13 && found_id[3].size() == 13:
+		yield(get_tree().create_timer(0.5), "timeout")
+		game_started = false
+		$KingSprite.show()
+	pass
+
 
 func arrange_card_children():
 	# make cascade cards be layered so that the top cards in each cascade
@@ -330,8 +322,9 @@ func arrange_card_children():
 			$Cards.move_child(foundation_card, j)
 	pass
  
-func _on_StartButton_pressed():
+func _on_DealButton_pressed():
 	move_child($CardDeck, get_child_count())
+	$KingSprite.hide()
 	game_started = false
 	# on start clear the board of all ids
 	clear_board()
@@ -350,7 +343,29 @@ func _on_StartButton_pressed():
 	check_for_auto_move()
 	pass 
 
+func _on_Restart_pressed():
+	if card_id.size() != 0:
+		move_child($CardDeck, get_child_count())
+		game_started = false
+		$KingSprite.hide()
+		# on start clear the board of all ids
+		clear_board()
+		#  + move all cards back to start
+		give_cards_start_pos()
+		# give randomized ids to cards and move 
+		give_cards_randomized_pos()
+		arrange_card_children()
+		# wait for cards to go to their positions
+		yield(get_tree().create_timer(0.75), "timeout")
+		move_child($CardDeck, 1)
+		game_started = true
+		set_process(true)
+		check_for_auto_move()
+	pass
+
 # ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
+
+var card_id := []
 
 #Cards: from 0 -> 51
 #4 sets - hearts (♥) -> 0
@@ -367,8 +382,6 @@ func randomize_set():
 	# internal random number generator
 	randomize()
 	
-	var card_id := []
-	
 	# creating the Array that will hold nums from 0 to 51
 	for i in range(52):
 		card_id.append(i)
@@ -384,10 +397,6 @@ func randomize_set():
 		card_id[poz] = aux
 	
 	# YOU HAPPY NOW IOSUA?
-	
-	# adding the randomized array to the cascade_id array
-	for i in range(52):
-		casc_id[i % 8][i / 8] = card_id[i]
 	pass
 
 # -------------------------------- BOARD FUnCTIONS ----------------------------------------------------------------
@@ -442,6 +451,9 @@ func give_cards_start_pos():
 	pass
 
 func give_cards_randomized_pos():
+	# adding the randomized array to the cascade_id array
+	for i in range(52):
+		casc_id[i % 8][i / 8] = card_id[i]
 	# 1 - take every id in casc_id,
 	# 2 - look for card with that id in cards
 	# 3 - give that card the pos from casc_pos and respective coordinate
@@ -472,3 +484,5 @@ func clear_board():
 		selected_card.change_shader()
 		selected_card = null
 	pass
+
+

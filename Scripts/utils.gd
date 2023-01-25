@@ -42,7 +42,7 @@ class Card extends Control:
 	
 	func _process(delta):
 		# lerp so it doesnt move directly to pos
-		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 90) 
+		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 80) 
 		pass
 	
 	func _on_TButton_pressed():
