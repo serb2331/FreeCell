@@ -39,7 +39,7 @@ func _process(delta):
 
 # -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
 
-func move_card_to_coordinate(card, to_coord):
+func find_proper_movement(card, to_coord):
 	# if we move card to free cell
 	if to_coord.x == -1:
 		# if we move card from free cell
@@ -52,6 +52,13 @@ func move_card_to_coordinate(card, to_coord):
 		# if we move card from cascade
 		if card.coord.x >= 0:
 			casc_id[card.coord.x][card.coord.y] = null
+
+			card.coord = to_coord
+
+			fc_id[card.coord.y] = card.id
+		# if we move from foundation
+		if card.coord.x == -2:
+			found_id[card.coord.y].pop_back()
 
 			card.coord = to_coord
 
@@ -94,10 +101,26 @@ func move_card_to_coordinate(card, to_coord):
 			card.coord = to_coord
 
 			casc_id[card.coord.x][card.coord.y] = card.id
-		
+		# if we move from foundation
+		if card.coord.x == -2:
+			found_id[card.coord.y].pop_back()
+
+			card.coord = to_coord
+
+			casc_id[card.coord.x][card.coord.y] = card.id
+		arrange_card_children()
 		# move card texture
 		card.pos = casc_pos[card.coord.x][card.coord.y]
-	yield(get_tree().create_timer(0.05),"timeout")
+	yield(get_tree().create_timer(0.05), "timeout")
+	pass
+
+# called when manual move or auto move, not undo
+func move_card_to_coordinate(card, to_coord):
+	# hold move in undo_moves
+	undo_moves.push_back( [card, card.coord] )
+	
+	# find and make the move
+	yield(find_proper_movement(card, to_coord), "completed")
 	_on_movement()
 	pass
 
@@ -213,6 +236,30 @@ func _on_Card_press(card_id: int):
 					if selected_card.color % 2 != card.color % 2 && selected_card.number == card.number - 1:
 						move_card_to_coordinate(selected_card, Vector2(card.coord.x, card.coord.y + 1))
 						deselect_card()
+#					elif selected_card.coord.x >= 0:
+#						# have i go to the topmost available card for movement in the card stack
+#						# use i and j to compare cards one on top of another(j bottom card, i top card)
+#						var ok_move = false
+#						var j = selected_card.coord.y
+#						var i = selected_card.coord.y - 1
+#						var j_card = cards[casc_id[selected_card.coord.x][j]]
+#						var i_card = cards[casc_id[selected_card.coord.x][i]]
+#						while (i_card.color % 2 != j_card.color % 2 && i_card.number == j_card.number + 1) && i > 0:
+#							if i_card.color % 2 != card.color % 2 && i_card.number == card.number - 1:
+#								ok_move = true
+#								break
+#							else:
+#								i -= 1
+#								j -= 1
+#								j_card = cards[casc_id[selected_card.coord.x][j]]
+#								i_card = cards[casc_id[selected_card.coord.x][i]]
+#						if ok_move && count_max_card_number_to_move() >= (casc_id[selected_card.coord.x].size() - casc_id[selected_card.coord.x].count(null) - i):
+#							var to_coord = Vector2(card.coord.x, card.coord.y + 1)
+#							var selected_card_coords = selected_card.coord
+#							print(selected_card_coords)
+#							for index in range (i, selected_card_coords.y + 1):
+#								move_card_to_coordinate(cards[casc_id[selected_card_coords.x][i]], Vector2(to_coord.x, to_coord.y + index - i))
+#								yield(get_tree().create_timer(0.5), "timeout")
 					else:
 						deselect_card()
 						select_card(card)
@@ -275,6 +322,18 @@ func _on_Background_press():
 	deselect_card()
 	pass
 
+func count_max_card_number_to_move():
+	var count_empty_casc = 0
+	var count_empty_fc = 0
+	for i in range(8):
+		if casc_id[i][0] == null:
+			count_empty_casc += 1
+	for i in range(4):
+		if fc_id[i] == null:
+			count_empty_fc += 1
+	
+	return pow(2.0, count_empty_casc) * (count_empty_fc + 1)
+
 # this function:
 #  -arranges the card children in the scene tree because of an issue
 #   regarding the layering of TextureButtons
@@ -298,6 +357,7 @@ func check_game_finish():
 		yield(get_tree().create_timer(0.5), "timeout")
 		game_started = false
 		$KingSprite.show()
+		$QueenSprite.show()
 	pass
 
 
@@ -322,9 +382,10 @@ func arrange_card_children():
 			$Cards.move_child(foundation_card, j)
 	pass
  
-func _on_DealButton_pressed():
+func _on_Deal_pressed():
 	move_child($CardDeck, get_child_count())
 	$KingSprite.hide()
+	$QueenSprite.hide()
 	game_started = false
 	# on start clear the board of all ids
 	clear_board()
@@ -348,6 +409,7 @@ func _on_Restart_pressed():
 		move_child($CardDeck, get_child_count())
 		game_started = false
 		$KingSprite.hide()
+		$QueenSprite.hide()
 		# on start clear the board of all ids
 		clear_board()
 		#  + move all cards back to start
@@ -361,6 +423,20 @@ func _on_Restart_pressed():
 		game_started = true
 		set_process(true)
 		check_for_auto_move()
+	pass
+
+# have undo_moves array to hold last moves done
+# it will hold moves like this (card, [from coord])
+var undo_moves: Array
+
+func _on_Undo_pressed():
+	if undo_moves.size() != 0 && game_started:
+		deselect_card()
+		var undo_move = undo_moves[undo_moves.size() - 1]
+		print(undo_move[0].id, " ", undo_move[1])
+		undo_moves.pop_back()
+		find_proper_movement(undo_move[0], undo_move[1])
+		arrange_card_children()
 	pass
 
 # ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
@@ -480,9 +556,9 @@ func clear_board():
 	fc_id.clear()
 	fc_id.append_array([null, null, null, null])
 	
+	undo_moves.clear()
+	
 	if selected_card != null:
 		selected_card.change_shader()
 		selected_card = null
 	pass
-
-
