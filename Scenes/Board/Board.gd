@@ -124,6 +124,28 @@ func move_card_to_coordinate(card, to_coord):
 	_on_movement()
 	pass
 
+func move_stack(start_pos: Vector2, stack_height: int, end_pos: Vector2):
+	
+	for index in range(start_pos.y - stack_height + 1, start_pos.y + 1):
+		find_proper_movement(cards[casc_id[start_pos.x][index]], end_pos + Vector2(0, index - (start_pos.y - stack_height + 1) + 1))
+		yield(get_tree().create_timer(0.15), "timeout")
+	_on_movement()
+
+func get_maximum_moveable_stack_size() -> int:
+	
+	var empty_cascades: int = 0
+	var empty_fcs: int = 0
+	
+	for index in range(8):
+		if (casc_id[index][0] == null):
+			empty_cascades += 1
+	
+	for index in range(4):
+		if (fc_id[index] == null):
+			empty_fcs += 1
+	
+	return (empty_fcs + 1) * int(pow(2, empty_cascades))
+
 func select_card(card):
 	selected_card = card
 	selected_card.change_shader()
@@ -161,7 +183,8 @@ func check_for_auto_move():
 				found_top_card_num = -1
 			else:
 				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
-			if card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num:
+			if ((card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num) ||
+				 card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num + 1):
 				move_card_to_coordinate(card_check, Vector2(-2, card_check.color))
 				return
 			
@@ -175,7 +198,8 @@ func check_for_auto_move():
 				found_top_card_num = -1
 			else:
 				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
-			if card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num:
+			if ((card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num) ||
+				 card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num + 1):
 				move_card_to_coordinate(card_check, Vector2(-2, card_check.color))
 				return
 			
@@ -211,6 +235,8 @@ func _on_Card_press(card_id: int):
 				if selected_card.color == card.color && selected_card.number == card.number + 1:
 					move_card_to_coordinate(selected_card, Vector2(-2, card.color))
 				deselect_card()
+		
+		
 		# if card is in free cell
 		elif card.coord.x == -1:
 			if selected_card == null:
@@ -218,6 +244,8 @@ func _on_Card_press(card_id: int):
 			else:
 				deselect_card()
 				select_card(card)
+		
+		
 		# if card is in cascade
 		else:
 			if selected_card == null:
@@ -231,38 +259,47 @@ func _on_Card_press(card_id: int):
 							move_card_to_coordinate(selected_card, Vector2(-1, i))
 							break
 					deselect_card()
+				
 				else:
-					# ...check for compatibility for movement and move accordingly
-					if selected_card.color % 2 != card.color % 2 && selected_card.number == card.number - 1:
-						move_card_to_coordinate(selected_card, Vector2(card.coord.x, card.coord.y + 1))
-						deselect_card()
-#					elif selected_card.coord.x >= 0:
-#						# have i go to the topmost available card for movement in the card stack
-#						# use i and j to compare cards one on top of another(j bottom card, i top card)
-#						var ok_move = false
-#						var j = selected_card.coord.y
-#						var i = selected_card.coord.y - 1
-#						var j_card = cards[casc_id[selected_card.coord.x][j]]
-#						var i_card = cards[casc_id[selected_card.coord.x][i]]
-#						while (i_card.color % 2 != j_card.color % 2 && i_card.number == j_card.number + 1) && i > 0:
-#							if i_card.color % 2 != card.color % 2 && i_card.number == card.number - 1:
-#								ok_move = true
-#								break
-#							else:
-#								i -= 1
-#								j -= 1
-#								j_card = cards[casc_id[selected_card.coord.x][j]]
-#								i_card = cards[casc_id[selected_card.coord.x][i]]
-#						if ok_move && count_max_card_number_to_move() >= (casc_id[selected_card.coord.x].size() - casc_id[selected_card.coord.x].count(null) - i):
-#							var to_coord = Vector2(card.coord.x, card.coord.y + 1)
-#							var selected_card_coords = selected_card.coord
-#							print(selected_card_coords)
-#							for index in range (i, selected_card_coords.y + 1):
-#								move_card_to_coordinate(cards[casc_id[selected_card_coords.x][i]], Vector2(to_coord.x, to_coord.y + index - i))
-#								yield(get_tree().create_timer(0.5), "timeout")
-					else:
+					if (selected_card.coord.x == -1):
+						if (card.color % 2 != selected_card.color % 2 && card.number == selected_card.number + 1):
+							move_card_to_coordinate(selected_card, Vector2(card.coord.x, card.coord.y + 1))
 						deselect_card()
 						select_card(card)
+					
+					else:
+						
+						# there are 2 types of stacks, K-B and K-R
+						# if card number % 2 + color number % 2  -> even => card is part of a K-R stack
+						# ---------------||--------------------  -> odd  => card is part of a K-B stack
+						
+						if (((card.color % 2 + card.number % 2) % 2 == (selected_card.color % 2 + selected_card.number % 2) % 2)
+							&& selected_card.number < card.number):
+							
+							#find apropriate card start of the movable card stack
+							
+							var needed_stack_size: int = card.number - selected_card.number
+							if (selected_card.coord.y - needed_stack_size >= -1 && get_maximum_moveable_stack_size() >= needed_stack_size):
+								var stack_is_complete: bool = true
+								
+								for index in range(selected_card.coord.y - 1, selected_card.coord.y - needed_stack_size, -1):
+									# cards[casc_id[selected_card.coord.x][index]]
+									if !((cards[casc_id[selected_card.coord.x][index]].color % 2 != cards[casc_id[selected_card.coord.x][index + 1]].color % 2)
+									   && cards[casc_id[selected_card.coord.x][index]].number == cards[casc_id[selected_card.coord.x][index + 1]].number + 1):
+										stack_is_complete = false
+								
+								if(stack_is_complete):
+									#start the movement
+									move_stack(selected_card.coord, needed_stack_size, card.coord)
+									deselect_card()
+							else:
+								deselect_card()
+								select_card(card)
+							
+						else:
+							deselect_card()
+							select_card(card)
+				
 	pass
 
 # (ONLY WHEN PRESSING THE EMPTY FREECELL, CARDS IN FREECELL CALL CARD_PRESS) 
@@ -312,7 +349,25 @@ func _on_Foundation_press(foundation):
 # ONLY WHEN CASCADE IS COMPLETELY EMPTY
 func _on_CascadeBottom_press(cascade):
 	if selected_card != null:
-		move_card_to_coordinate(selected_card, Vector2(cascade, 0))
+		
+		if (selected_card.coord.x == -1):
+			move_card_to_coordinate(selected_card, Vector2(cascade, 0))
+		
+		elif (selected_card.coord.x >= 0):
+			var stack_size: int = min(get_maximum_moveable_stack_size(), selected_card.coord.y)
+			print(stack_size)
+			var index_stop: int = -1
+			for index in range(selected_card.coord.y - 1, selected_card.coord.y - stack_size, -1):
+				
+				if (index_stop != -1):
+					break
+				
+				elif !((cards[casc_id[selected_card.coord.x][index]].color % 2 != cards[casc_id[selected_card.coord.x][index + 1]].color % 2)
+				   && cards[casc_id[selected_card.coord.x][index]].number == cards[casc_id[selected_card.coord.x][index + 1]].number + 1):
+					index_stop = index + 1
+			
+			move_stack(selected_card.coord, selected_card.coord.y - index_stop + 1, Vector2(cascade, -1))
+		
 	deselect_card()
 	pass # Replace with function body.
 
@@ -451,7 +506,7 @@ var card_id := []
 #	each 13 --> 52 cards in total
 
 #- num / 13 => card colour
-#- num % 13 => card number
+#- num % 13 => card number (Ace - 0, King - 12)
 
 func randomize_set():
 	# using randomize() to randomize the seed of the 
