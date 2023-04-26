@@ -57,16 +57,20 @@ class Card extends Control:
 			texture_button.set_material(Utils.INVERTCOLOR_SHADER)
 		pass
 
-enum UNDO_TYPES {
-	ONE_CARD = 1,
-	STACK = 2
-}
-
-class undo_move:
-	var undo_variety: int 
+class UndoMove:
+	# card array, +-card stack, from coord, to coord
 	
-	func _init(undo_variety: int):
-		print(undo_variety)
+	#from bottom up
+	var card_array: Array
+	
+	var from_coord: Vector2
+	var to_coord: Vector2
+	
+	
+	func _init(given_card_array: Array, given_from_coord: Vector2, given_to_coord: Vector2):
+		self.card_array = given_card_array
+		self.from_coord = given_from_coord
+		self.to_coord = given_to_coord
 	
 	pass
 # --------------------------------- _ready() and _process(delta) ----------------------------------------
