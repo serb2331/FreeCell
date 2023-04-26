@@ -126,6 +126,8 @@ func move_card_to_coordinate(card, to_coord):
 
 func move_stack(start_pos: Vector2, stack_height: int, end_pos: Vector2):
 	
+	print(start_pos, " ", stack_height, " ", end_pos)
+	
 	for index in range(start_pos.y - stack_height + 1, start_pos.y + 1):
 		find_proper_movement(cards[casc_id[start_pos.x][index]], end_pos + Vector2(0, index - (start_pos.y - stack_height + 1) + 1))
 		yield(get_tree().create_timer(0.15), "timeout")
@@ -264,8 +266,10 @@ func _on_Card_press(card_id: int):
 					if (selected_card.coord.x == -1):
 						if (card.color % 2 != selected_card.color % 2 && card.number == selected_card.number + 1):
 							move_card_to_coordinate(selected_card, Vector2(card.coord.x, card.coord.y + 1))
-						deselect_card()
-						select_card(card)
+							deselect_card()
+						else:
+							deselect_card()
+							select_card(card)
 					
 					else:
 						
@@ -354,19 +358,22 @@ func _on_CascadeBottom_press(cascade):
 			move_card_to_coordinate(selected_card, Vector2(cascade, 0))
 		
 		elif (selected_card.coord.x >= 0):
-			var stack_size: int = min(get_maximum_moveable_stack_size(), selected_card.coord.y)
-			print(stack_size)
-			var index_stop: int = -1
-			for index in range(selected_card.coord.y - 1, selected_card.coord.y - stack_size, -1):
+			var possible_stack_size: int = min(get_maximum_moveable_stack_size() / 2, selected_card.coord.y)
+			print(possible_stack_size, " ", selected_card.coord, Vector2(cascade, 0))
+			var stack_stop_size: int = -1
+			for index in range(1, possible_stack_size):
 				
-				if (index_stop != -1):
+				if (stack_stop_size != -1):
 					break
 				
-				elif !((cards[casc_id[selected_card.coord.x][index]].color % 2 != cards[casc_id[selected_card.coord.x][index + 1]].color % 2)
-				   && cards[casc_id[selected_card.coord.x][index]].number == cards[casc_id[selected_card.coord.x][index + 1]].number + 1):
-					index_stop = index + 1
+				elif !((cards[casc_id[selected_card.coord.x][selected_card.coord.y - index]].color % 2 != cards[casc_id[selected_card.coord.x][selected_card.coord.y - index + 1]].color % 2)
+				   && cards[casc_id[selected_card.coord.x][selected_card.coord.y - index]].number == cards[casc_id[selected_card.coord.x][selected_card.coord.y - index + 1]].number + 1):
+					stack_stop_size = index
 			
-			move_stack(selected_card.coord, selected_card.coord.y - index_stop + 1, Vector2(cascade, -1))
+			if (stack_stop_size == -1):
+				stack_stop_size = possible_stack_size
+			
+			move_stack(selected_card.coord, stack_stop_size, Vector2(cascade, -1))
 		
 	deselect_card()
 	pass # Replace with function body.
