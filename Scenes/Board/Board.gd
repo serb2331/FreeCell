@@ -28,7 +28,6 @@ func _ready():
 	for i in range(4):
 		var foundation = get_node("Foundation" + String(i + 1))
 		foundation.texture_normal = FoundationSpriteSheet.get_frame("default", i)
-	set_process(false)
 	# create all possible card object positions
 	create_positions()
 	# create the 52 cards and place behind card deck sprite
@@ -36,7 +35,12 @@ func _ready():
 
 # -------------------------------- GAMEPLAY FUNCTIONS -------------------------------------------------
 
-func find_proper_movement(card, to_coord):
+#turn find_proper_movement() into 3 funcs:
+# - move_card_ids
+# - arrange_card_children()
+# - move_card_position
+
+func move_card_id(card, to_coord):
 	# if we move card to free cell
 	if to_coord.x == -1:
 		# if we move card from free cell
@@ -61,8 +65,6 @@ func find_proper_movement(card, to_coord):
 
 			fc_id[card.coord.y] = card.id
 		
-		# move card texture
-		card.pos = fc_pos[card.coord.y]
 	# if we move card to foundation
 	if to_coord.x == -2:
 		# if we move card from free cell
@@ -80,8 +82,6 @@ func find_proper_movement(card, to_coord):
 
 			found_id[card.coord.y].append(card.id)
 		
-		# move card texture
-		card.pos = found_pos[card.coord.y]
 	# if we move card to cascade
 	if to_coord.x >= 0 && to_coord.y <=17:
 		# if we move card from free cell
@@ -105,20 +105,31 @@ func find_proper_movement(card, to_coord):
 			card.coord = to_coord
 
 			casc_id[card.coord.x][card.coord.y] = card.id
-		arrange_card_children()
-		# move card texture
-		card.pos = casc_pos[card.coord.x][card.coord.y]
-	yield(get_tree().create_timer(0.05), "timeout")
+
+func move_card_pos(card, to_coord):
+	match to_coord.x:
+		-1.0:
+			card.pos = fc_pos[card.coord.y]
+		-2.0:
+			card.pos = found_pos[card.coord.y]
+		_:
+			card.pos = casc_pos[to_coord.x][to_coord.y]
 
 # called when manual move or auto move, not undo
-func move_card(card, to_coord):
+func move_single_card(card, to_coord):
 	
 	# hold move in undo_moves
-	var undo: Utils.UndoMove = Utils.UndoMove.new([card], card.coord, to_coord)
+	var undo := Utils.UndoMove.new([card], card.coord, to_coord)
 	undo_moves.push_back(undo)
 	
 	# find and make the move
-	yield(find_proper_movement(card, to_coord), "completed")
+#	yield(find_proper_movement(card, to_coord), "completed")
+	
+	move_card_id(card, to_coord)
+	arrange_card_children()
+	move_card_pos(card, to_coord)
+	yield(get_tree().create_timer(0.07), "timeout")
+	
 	_on_movement()
 
 func move_stack(start_pos: Vector2, stack_size: int, end_pos: Vector2):
@@ -128,12 +139,21 @@ func move_stack(start_pos: Vector2, stack_size: int, end_pos: Vector2):
 	for index in range(start_pos.y - stack_size + 1, start_pos.y + 1):
 		undo_card_array.push_back(cards[casc_id[start_pos.x][index]])
 	
-	var undo: Utils.UndoMove = Utils.UndoMove.new(undo_card_array, start_pos, end_pos)
+	var undo := Utils.UndoMove.new(undo_card_array, start_pos, end_pos)
 	undo_moves.push_back(undo)
 	
+	var cards_to_be_moved: Array = []
+	
 	for index in range(start_pos.y - stack_size + 1, start_pos.y + 1):
-		find_proper_movement(cards[casc_id[start_pos.x][index]], end_pos + Vector2( 0, index - (start_pos.y - stack_size) ))
-		yield(get_tree().create_timer(0.1), "timeout")
+		cards_to_be_moved.append(cards[casc_id[start_pos.x][index]])
+	
+	for index in range(stack_size):
+		move_card_id(cards_to_be_moved[index], end_pos + Vector2( 0, index + 1))
+	
+	for index in range(stack_size):
+		move_card_pos(cards_to_be_moved[index], end_pos + Vector2( 0, index + 1 ))
+		yield(get_tree().create_timer(0.07), "timeout")
+	
 	_on_movement()
 
 func get_maximum_moveable_stack_size() -> int:
@@ -188,7 +208,7 @@ func check_for_auto_move():
 				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
 			if ((card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num) ||
 				 card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num + 1):
-				move_card(card_check, Vector2(-2, card_check.color))
+				move_single_card(card_check, Vector2(-2, card_check.color))
 				return
 			
 	for i in range(4):
@@ -203,10 +223,11 @@ func check_for_auto_move():
 				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
 			if ((card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num) ||
 				 card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num + 1):
-				move_card(card_check, Vector2(-2, card_check.color))
+				move_single_card(card_check, Vector2(-2, card_check.color))
 				return
 
 # (CALLS FOR CARD PRESSES IN FREECELL AND FOUNDATION TOPS)
+# warning-ignore:shadowed_variable
 func _on_Card_press(card_id: int):
 	# print("card ", cards[card_id].coord)
 	# the pressed card
@@ -234,7 +255,7 @@ func _on_Card_press(card_id: int):
 			# if we have a selected card
 			if selected_card != null:
 				if selected_card.color == card.color && selected_card.number == card.number + 1:
-					move_card(selected_card, Vector2(-2, card.color))
+					move_single_card(selected_card, Vector2(-2, card.color))
 				deselect_card()
 		
 		
@@ -257,14 +278,14 @@ func _on_Card_press(card_id: int):
 					# ...add to first available free cell
 					for i in range(4):
 						if fc_id[i] == null:
-							move_card(selected_card, Vector2(-1, i))
+							move_single_card(selected_card, Vector2(-1, i))
 							break
 					deselect_card()
 				
 				else:
 					if (selected_card.coord.x == -1):
 						if (card.color % 2 != selected_card.color % 2 && card.number == selected_card.number + 1):
-							move_card(selected_card, Vector2(card.coord.x, card.coord.y + 1))
+							move_single_card(selected_card, Vector2(card.coord.x, card.coord.y + 1))
 							deselect_card()
 						else:
 							deselect_card()
@@ -295,6 +316,9 @@ func _on_Card_press(card_id: int):
 									#start the movement
 									move_stack(selected_card.coord, needed_stack_size, card.coord)
 									deselect_card()
+								else:
+									deselect_card()
+									select_card(card)
 							else:
 								deselect_card()
 								select_card(card)
@@ -313,7 +337,7 @@ func _on_FreeCell_press(freecell):
 			# ...and the free cell is empty...
 			if fc_id[freecell] == null:
 				# ...move the selected card to free cell position
-				move_card(selected_card, Vector2(-1, freecell))
+				move_single_card(selected_card, Vector2(-1, freecell))
 				
 				# and deselect card
 				deselect_card()
@@ -325,7 +349,6 @@ func _on_FreeCell_press(freecell):
 			if fc_id[freecell] != null:
 				# ...select the card in the free cell
 				select_card(cards[fc_id[freecell]])
-	pass
 
 # (ONLY WHEN PRESSING THE EMPTY FOUNDATION, CARDS IN FOUNDATION CALL CARD_PRESS) 
 # foundation holds which foundation was pressed
@@ -340,9 +363,8 @@ func _on_Foundation_press(foundation):
 	#  -> move card to foundation
 	if selected_card != null:
 		if selected_card.color == foundation && selected_card.number == 0:
-			move_card(selected_card, Vector2(-2, foundation))
+			move_single_card(selected_card, Vector2(-2, foundation))
 	deselect_card()
-	pass # Replace with function body.
 
 # this function is called only when pressing the bottom most position of cascade
 # ONLY WHEN CASCADE IS COMPLETELY EMPTY
@@ -350,7 +372,7 @@ func _on_CascadeBottom_press(cascade):
 	if selected_card != null:
 		
 		if (selected_card.coord.x == -1):
-			move_card(selected_card, Vector2(cascade, 0))
+			move_single_card(selected_card, Vector2(cascade, 0))
 		
 		elif (selected_card.coord.x >= 0):
 			var possible_stack_size: int = min(get_maximum_moveable_stack_size() / 2, selected_card.coord.y)
@@ -376,7 +398,6 @@ func _on_CascadeBottom_press(cascade):
 # and has selected card, deselect it
 func _on_Background_press():
 	deselect_card()
-	pass
 
 func count_max_card_number_to_move():
 	var count_empty_casc = 0
@@ -403,8 +424,6 @@ func _on_movement():
 	check_game_finish()
 	
 	check_for_auto_move()
-	
-	pass
 
 # -------------------------------- GAME STATE FUNCTIONS -----------------------------------------
 
@@ -414,7 +433,6 @@ func check_game_finish():
 		game_started = false
 		$KingSprite.show()
 		$QueenSprite.show()
-	pass
 
 
 func arrange_card_children():
@@ -436,7 +454,6 @@ func arrange_card_children():
 		for j in range(found_id[i].size()):
 			var foundation_card = cards[found_id[i][j]]
 			$Cards.move_child(foundation_card, j)
-	pass
  
 func _on_Deal_pressed():
 	move_child($CardDeck, get_child_count())
@@ -445,8 +462,6 @@ func _on_Deal_pressed():
 	game_started = false
 	# on start clear the board of all ids
 	clear_board()
-	#  + move all cards back to start
-	give_cards_start_pos()
 	# randomize a new set of ids
 	randomize_set()
 	# give randomized ids to cards and move 
@@ -466,8 +481,6 @@ func _on_Restart_pressed():
 		$QueenSprite.hide()
 		# on start clear the board of all ids
 		clear_board()
-		#  + move all cards back to start
-		give_cards_start_pos()
 		# give randomized ids to cards and move 
 		give_cards_randomized_pos()
 		arrange_card_children()
@@ -487,20 +500,37 @@ func _on_Undo_pressed():
 		deselect_card()
 		var undo_move: Utils.UndoMove = undo_moves.back()
 		undo_moves.pop_back()
-		print(undo_move.card_array.size(), " ", undo_move.from_coord, " ", undo_move.to_coord)
+#		print(undo_move.card_array.size(), " ", undo_move.from_coord, " ", undo_move.to_coord)
 		
 		match undo_move.to_coord.x:
 			(-1.0):
-				find_proper_movement(undo_move.card_array[0], undo_move.from_coord)
+				move_card_id(undo_move.card_array[0], undo_move.from_coord)
+				arrange_card_children()
+				move_card_pos(undo_move.card_array[0], undo_move.from_coord)
+				yield(get_tree().create_timer(0.07), "timeout")
 			(-2.0):
-				find_proper_movement(undo_move.card_array[0], undo_move.from_coord)
+				move_card_id(undo_move.card_array[0], undo_move.from_coord)
+				arrange_card_children()
+				move_card_pos(undo_move.card_array[0], undo_move.from_coord)
+				yield(get_tree().create_timer(0.07), "timeout")
 			_:
 				if (undo_move.from_coord.x == -1):
-					find_proper_movement(undo_move.card_array[0], undo_move.from_coord)
+					move_card_id(undo_move.card_array[0], undo_move.from_coord)
+					arrange_card_children()
+					move_card_pos(undo_move.card_array[0], undo_move.from_coord)
+					yield(get_tree().create_timer(0.07), "timeout")
 				else:
-					for index in range(1, undo_move.card_array.size() + 1):
-						find_proper_movement(cards[casc_id[undo_move.to_coord.x][undo_move.to_coord.y + index]], Vector2( undo_move.from_coord.x, undo_move.from_coord.y - undo_move.card_array.size() + index ))
-						yield(get_tree().create_timer(0.15), "timeout")
+					var cards_to_be_moved: Array = []
+					
+					for index in range(undo_move.to_coord.y + 1, undo_move.to_coord.y + undo_move.card_array.size() + 1):
+						cards_to_be_moved.append(cards[casc_id[undo_move.to_coord.x][index]])
+					
+					for index in range(undo_move.card_array.size()):
+						move_card_id(cards_to_be_moved[index], Vector2( undo_move.from_coord.x, undo_move.from_coord.y - undo_move.card_array.size() + index + 1 ) )
+					
+					for index in range(undo_move.card_array.size()):
+						move_card_pos(cards_to_be_moved[index], Vector2( undo_move.from_coord.x, undo_move.from_coord.y - undo_move.card_array.size() + index + 1 ) )
+						yield(get_tree().create_timer(0.07), "timeout")
 		
 		arrange_card_children()
 
@@ -573,17 +603,9 @@ func create_cards():
 		# add in scene tree so its visible
 		$Cards.add_child(card)
 		card.add_child(card.texture_button)
-#		card.mouse_filter = MOUSE_FILTER_STOP 
 		# connect the card_press signal (specific to the card class) 
 		card.connect("card_press", self, "_on_Card_press")
 
-func give_cards_start_pos():
-	for i in cards:
-		# give start coordinate (doesnt affect anything cause will be changed immediately after)
-		i.coord = Vector2(-3, -3)
-		
-		# change pos to be behind the CardDeck Sprite
-		i.pos = card_start_pos
 
 func give_cards_randomized_pos():
 	# adding the randomized array to the cascade_id array
@@ -619,3 +641,6 @@ func clear_board():
 	if selected_card != null:
 		selected_card.change_shader()
 		selected_card = null
+
+#func _process(delta):
+#	print(cards[10].is_moving)

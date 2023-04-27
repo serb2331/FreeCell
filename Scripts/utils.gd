@@ -23,7 +23,7 @@ class Card extends Control:
 	# if card is in foundation -> coordinate = Vector2 from (-2, 0) to (-2, 3)
 	var coord = Vector2.ZERO
 	
-	# position on screen
+	# position on screen change this when moving to make animoation of movement
 	var pos = Vector2.ZERO
 
 	signal card_press
@@ -38,24 +38,20 @@ class Card extends Control:
 		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
 		
 		texture_button.connect("button_down", self, "_on_TButton_pressed")
-		pass
 	
 	func _process(delta):
 		# lerp so it doesnt move directly to pos
-		self.rect_position = lerp(self.rect_position, self.pos, 0.12 * delta * 80) 
-		pass
+		rect_position = lerp(rect_position, pos, 0.12 * delta * 80)
+	
 	
 	func _on_TButton_pressed():
-		
 		emit_signal("card_press", id)
-		pass
 	
 	func change_shader():
 		if texture_button.get_material() == Utils.INVERTCOLOR_SHADER:
 			texture_button.set_material(null)
 		else:
 			texture_button.set_material(Utils.INVERTCOLOR_SHADER)
-		pass
 
 class UndoMove:
 	# card array, +-card stack, from coord, to coord
@@ -71,13 +67,3 @@ class UndoMove:
 		self.card_array = given_card_array
 		self.from_coord = given_from_coord
 		self.to_coord = given_to_coord
-	
-	pass
-# --------------------------------- _ready() and _process(delta) ----------------------------------------
-
-func _ready():
-	pass
-
-func _process(delta):
-	
-	pass
