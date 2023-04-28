@@ -2,15 +2,15 @@
 
 [ext_resource path="res://Assets/Fonts/AlagardTitle.tres" type="DynamicFont" id=1]
 [ext_resource path="res://Assets/Fonts/AlagardText.tres" type="DynamicFont" id=2]
-[ext_resource path="res://Scenes/MainMenu/MainMenu.gd" type="Script" id=3]
-[ext_resource path="res://Scenes/MainMenu/Indicator2.gd" type="Script" id=4]
-[ext_resource path="res://Scenes/MainMenu/Indicator1.gd" type="Script" id=5]
+[ext_resource path="res://Scenes/MainMenu/Indicator2.gd" type="Script" id=3]
+[ext_resource path="res://Scenes/MainMenu/Indicator1.gd" type="Script" id=4]
+[ext_resource path="res://Scenes/MainMenu/MainMenu.gd" type="Script" id=5]
 [ext_resource path="res://Assets/background.png" type="Texture" id=6]
 
 [node name="MainMenu" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource( 3 )
+script = ExtResource( 5 )
 
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 256, 150 )
@@ -40,7 +40,7 @@ margin_bottom = 163.0
 rect_scale = Vector2( 1.5, 1.5 )
 custom_fonts/normal_font = ExtResource( 2 )
 text = " ->"
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 
 [node name="StartButton" type="Button" parent="."]
 anchor_left = 0.5
@@ -67,7 +67,7 @@ margin_bottom = 213.0
 rect_scale = Vector2( 1.5, 1.5 )
 custom_fonts/normal_font = ExtResource( 2 )
 text = " ->"
-script = ExtResource( 4 )
+script = ExtResource( 3 )
 
 [node name="ExitButton" type="Button" parent="."]
 anchor_left = 0.5

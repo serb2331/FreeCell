@@ -1,6 +1,6 @@
 extends Node
 
-onready var DECK_SPRITESHEET = load("res://Assets/card_deck_bordered.tres")
+onready var CARDS_SPRITESHEET = load("res://Assets/cards_spriteframes.tres")
 
 onready var INVERTCOLOR_SHADER = load("res://Shaders/InvertColorMaterial.tres")
 # --------------------------- CARD CLASS ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class Card extends Control:
 		self.number = id % 13
 		
 		# set texture for the button for the specific frame in the spritesheet
-		texture_button.texture_normal = Utils.DECK_SPRITESHEET.get_frame("default", id)
+		texture_button.texture_normal = Utils.CARDS_SPRITESHEET.get_frame("big", id)
 		
 		texture_button.connect("button_down", self, "_on_TButton_pressed")
 	

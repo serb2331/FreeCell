@@ -208,6 +208,7 @@ func check_for_auto_move():
 				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
 			if ((card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num) ||
 				 card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num + 1):
+				deselect_card()
 				move_single_card(card_check, Vector2(-2, card_check.color))
 				return
 			
@@ -223,6 +224,7 @@ func check_for_auto_move():
 				found_top_card_num = found_id[card_check.color][found_id[card_check.color].size() - 1] % 13
 			if ((card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num) ||
 				 card_check.number == found_top_card_num + 1 && found_top_card_num == min_found_num + 1):
+				deselect_card()
 				move_single_card(card_check, Vector2(-2, card_check.color))
 				return
 
@@ -245,7 +247,6 @@ func _on_Card_press(card_id: int):
 			for i in range(casc_id[pressed_card.coord.x].size()):
 				if  casc_id[pressed_card.coord.x][i] != null && casc_id[pressed_card.coord.x][i + 1] == null:
 					card = cards[casc_id[pressed_card.coord.x][i]]
-					break
 		# if the pressed card is in a free cell or a foundation
 		else:
 			card = pressed_card
@@ -418,6 +419,7 @@ func count_max_card_number_to_move():
 #  -makes the CascadeButton texture btn enabled or disabled
 #   based on if there are cards in the cascade
 func _on_movement():
+	
 	
 	arrange_card_children()
 	
