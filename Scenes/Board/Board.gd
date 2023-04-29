@@ -2,8 +2,10 @@ extends Control
 
 # --------------------------------- VARIABLES ----------------------------------------
 
-onready var EmptyCardSprite = load("res://Assets/empty_card.png")
-onready var FoundationSpriteSheet: SpriteFrames = load("res://Assets/foundation.tres")
+onready var EmptyCardSprite = preload("res://Assets/empty_card.png")
+onready var FoundationSpriteSheet: SpriteFrames = preload("res://Assets/foundation.tres")
+
+onready var MainMenuScene: PackedScene = preload("res://Scenes/MainMenu/MainMenu.tscn")
 
 # holds card objects
 var cards: Array = []
@@ -536,6 +538,10 @@ func _on_Undo_pressed():
 		
 		arrange_card_children()
 
+func _on_MenuButton_pressed():
+	get_tree().change_scene_to(MainMenuScene)
+	pass
+
 # ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
 
 var card_id := []
@@ -643,6 +649,3 @@ func clear_board():
 	if selected_card != null:
 		selected_card.change_shader()
 		selected_card = null
-
-#func _process(delta):
-#	print(cards[10].is_moving)
