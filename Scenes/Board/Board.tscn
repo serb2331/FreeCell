@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://Scenes/Board/Board.gd" type="Script" id=1]
 [ext_resource path="res://Assets/card_deck.png" type="Texture" id=2]
@@ -14,6 +14,11 @@
 [ext_resource path="res://Assets/queen_sprite.png" type="Texture" id=12]
 [ext_resource path="res://Assets/menu_icon.png" type="Texture" id=13]
 [ext_resource path="res://Scenes/Board/FlipAnimation.gd" type="Script" id=14]
+[ext_resource path="res://Assets/sfx_off_asset.png" type="Texture" id=15]
+[ext_resource path="res://Assets/sfx_asset.png" type="Texture" id=16]
+[ext_resource path="res://Assets/Sounds/shuffle.wav" type="AudioStream" id=17]
+[ext_resource path="res://Assets/Sounds/draw.wav" type="AudioStream" id=18]
+[ext_resource path="res://Assets/Sounds/error.wav" type="AudioStream" id=19]
 
 [sub_resource type="Animation" id=19]
 resource_name = "Big"
@@ -198,6 +203,7 @@ tracks/0/keys = {
 [sub_resource type="Animation" id=27]
 resource_name = "Rotate"
 length = 3.0
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:rotation_degrees")
 tracks/0/interp = 1
@@ -208,7 +214,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
-"values": [ 0.0, 360.0 ]
+"values": [ 0.0, -360.0 ]
 }
 
 [node name="Board" type="Control"]
@@ -228,6 +234,19 @@ anchor_bottom = 1.0
 margin_top = 69.0
 focus_mode = 0
 flat = true
+
+[node name="SFXToggleButton" type="TextureButton" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -44.0
+margin_top = -36.0
+margin_right = -14.0
+margin_bottom = -13.0
+toggle_mode = true
+texture_normal = ExtResource( 16 )
+texture_pressed = ExtResource( 15 )
 
 [node name="KingSprite" type="Sprite" parent="."]
 visible = false
@@ -364,12 +383,12 @@ vframes = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_bottom = 1.0
 margin_left = 8.0
-margin_top = 99.0
+margin_top = 67.0
 margin_right = 65.0
 
 [node name="MenuButton" type="Button" parent="VBoxContainer"]
 margin_right = 57.0
-margin_bottom = 47.0
+margin_bottom = 55.0
 focus_mode = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -393,9 +412,9 @@ anims/Big = SubResource( 19 )
 anims/RESET = SubResource( 20 )
 
 [node name="UndoButton" type="Button" parent="VBoxContainer"]
-margin_top = 51.0
+margin_top = 59.0
 margin_right = 57.0
-margin_bottom = 98.0
+margin_bottom = 114.0
 focus_mode = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -422,9 +441,9 @@ anims/RESET = SubResource( 22 )
 anims/Rotate = SubResource( 28 )
 
 [node name="DealButton" type="Button" parent="VBoxContainer"]
-margin_top = 102.0
+margin_top = 118.0
 margin_right = 57.0
-margin_bottom = 149.0
+margin_bottom = 173.0
 focus_mode = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -448,9 +467,9 @@ anims/Big = SubResource( 23 )
 anims/RESET = SubResource( 24 )
 
 [node name="RestartButton" type="Button" parent="VBoxContainer"]
-margin_top = 153.0
+margin_top = 177.0
 margin_right = 57.0
-margin_bottom = 201.0
+margin_bottom = 233.0
 focus_mode = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -466,7 +485,6 @@ align = 1
 
 [node name="ResetSprite" type="Sprite" parent="VBoxContainer/RestartButton"]
 position = Vector2( 29, 28 )
-rotation = 6.28319
 texture = ExtResource( 9 )
 script = ExtResource( 11 )
 
@@ -475,7 +493,21 @@ anims/Big = SubResource( 25 )
 anims/RESET = SubResource( 26 )
 anims/Rotate = SubResource( 27 )
 
+[node name="ShuffleStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 17 )
+bus = "SFX"
+
+[node name="CardStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 18 )
+bus = "SFX"
+
+[node name="WrongStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 19 )
+volume_db = -10.0
+bus = "SFX"
+
 [connection signal="button_down" from="Background" to="." method="_on_Background_press"]
+[connection signal="toggled" from="SFXToggleButton" to="." method="_on_SFXToggleButton_toggled"]
 [connection signal="button_down" from="CascadeBottom1" to="." method="_on_CascadeBottom_press" binds= [ 0 ]]
 [connection signal="button_down" from="CascadeBottom2" to="." method="_on_CascadeBottom_press" binds= [ 1 ]]
 [connection signal="button_down" from="CascadeBottom3" to="." method="_on_CascadeBottom_press" binds= [ 2 ]]

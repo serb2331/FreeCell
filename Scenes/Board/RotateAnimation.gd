@@ -1,4 +1,4 @@
-extends Sprite
+extends Node
 
 var anim_time = 0
 

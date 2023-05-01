@@ -3,6 +3,8 @@ extends Node
 onready var CARDS_SPRITESHEET = load("res://Assets/cards_spriteframes.tres")
 
 onready var INVERTCOLOR_SHADER = load("res://Shaders/InvertColorMaterial.tres")
+
+var sfx_toggle: bool = true
 # --------------------------- CARD CLASS ---------------------------------------------------------------------------
 
 #CARD NOTATION:
@@ -52,6 +54,8 @@ class Card extends Control:
 			texture_button.set_material(null)
 		else:
 			texture_button.set_material(Utils.INVERTCOLOR_SHADER)
+
+#--------------------------- UNDO MOVE CLASS --------------------------------------------
 
 class UndoMove:
 	# card array, +-card stack, from coord, to coord

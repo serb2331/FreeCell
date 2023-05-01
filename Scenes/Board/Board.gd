@@ -7,6 +7,10 @@ onready var FoundationSpriteSheet: SpriteFrames = preload("res://Assets/foundati
 
 onready var MainMenuScene: PackedScene = preload("res://Scenes/MainMenu/MainMenu.tscn")
 
+onready var ShuffleSound: AudioStreamPlayer = $ShuffleStreamPlayer
+onready var CardSound: AudioStreamPlayer = $CardStreamPlayer
+onready var WrongSound: AudioStreamPlayer = $WrongStreamPlayer
+
 # holds card objects
 var cards: Array = []
 
@@ -22,11 +26,13 @@ var found_pos = [Vector2(295, 20), Vector2(335, 20), Vector2(375, 20), Vector2(4
 var fc_pos = [Vector2(60, 20), Vector2(100, 20), Vector2(140, 20), Vector2(180, 20)]
 
 var game_started: bool = false # if game is started
+var is_dealing: bool = false
 var selected_card: Utils.Card = null # selected card
 
 # --------------------------------- _ready() ----------------------------------------
 
 func _ready():
+	$SFXToggleButton.pressed = !Utils.sfx_toggle
 	for i in range(4):
 		var foundation = get_node("Foundation" + String(i + 1))
 		foundation.texture_normal = FoundationSpriteSheet.get_frame("default", i)
@@ -127,6 +133,8 @@ func move_single_card(card, to_coord):
 	# find and make the move
 #	yield(find_proper_movement(card, to_coord), "completed")
 	
+	if (Utils.sfx_toggle):
+		CardSound.play()
 	move_card_id(card, to_coord)
 	arrange_card_children()
 	move_card_pos(card, to_coord)
@@ -153,6 +161,8 @@ func move_stack(start_pos: Vector2, stack_size: int, end_pos: Vector2):
 		move_card_id(cards_to_be_moved[index], end_pos + Vector2( 0, index + 1))
 	
 	for index in range(stack_size):
+		if (Utils.sfx_toggle):
+			CardSound.play()
 		move_card_pos(cards_to_be_moved[index], end_pos + Vector2( 0, index + 1 ))
 		yield(get_tree().create_timer(0.07), "timeout")
 	
@@ -231,7 +241,6 @@ func check_for_auto_move():
 				return
 
 # (CALLS FOR CARD PRESSES IN FREECELL AND FOUNDATION TOPS)
-# warning-ignore:shadowed_variable
 func _on_Card_press(card_id: int):
 	# print("card ", cards[card_id].coord)
 	# the pressed card
@@ -291,6 +300,8 @@ func _on_Card_press(card_id: int):
 							move_single_card(selected_card, Vector2(card.coord.x, card.coord.y + 1))
 							deselect_card()
 						else:
+							if (Utils.sfx_toggle):
+								WrongSound.play()
 							deselect_card()
 							select_card(card)
 					
@@ -320,13 +331,19 @@ func _on_Card_press(card_id: int):
 									move_stack(selected_card.coord, needed_stack_size, card.coord)
 									deselect_card()
 								else:
+									if (Utils.sfx_toggle):
+										WrongSound.play()
 									deselect_card()
 									select_card(card)
 							else:
+								if (Utils.sfx_toggle):
+									WrongSound.play()
 								deselect_card()
 								select_card(card)
 							
 						else:
+							if (Utils.sfx_toggle):
+								WrongSound.play()
 							deselect_card()
 							select_card(card)
 
@@ -367,6 +384,9 @@ func _on_Foundation_press(foundation):
 	if selected_card != null:
 		if selected_card.color == foundation && selected_card.number == 0:
 			move_single_card(selected_card, Vector2(-2, foundation))
+		else:
+			if (Utils.sfx_toggle):
+				WrongSound.play()
 	deselect_card()
 
 # this function is called only when pressing the bottom most position of cascade
@@ -460,40 +480,57 @@ func arrange_card_children():
 			$Cards.move_child(foundation_card, j)
  
 func _on_Deal_pressed():
-	move_child($CardDeck, get_child_count())
-	$KingSprite.hide()
-	$QueenSprite.hide()
-	game_started = false
-	# on start clear the board of all ids
-	clear_board()
-	# randomize a new set of ids
-	randomize_set()
-	# give randomized ids to cards and move 
-	give_cards_randomized_pos()
-	arrange_card_children()
-	# wait for cards to go to their positions
-	yield(get_tree().create_timer(0.75), "timeout")
-	move_child($CardDeck, 1)
-	game_started = true
-	check_for_auto_move()
-
-func _on_Restart_pressed():
-	if card_id.size() != 0:
+	print(is_dealing)
+	if (!is_dealing):
 		move_child($CardDeck, get_child_count())
-		game_started = false
 		$KingSprite.hide()
 		$QueenSprite.hide()
+		game_started = false
+		is_dealing = true
 		# on start clear the board of all ids
 		clear_board()
+		# randomize a new set of ids
+		randomize_set()
+		
 		# give randomized ids to cards and move 
-		give_cards_randomized_pos()
+		give_cards_randomized_ids()
+		give_cards_positions(casc_id)
+		
+		if (Utils.sfx_toggle):
+			ShuffleSound.play()
+		
+#		yield(give_cards_positions(), "completed")
+		
 		arrange_card_children()
 		# wait for cards to go to their positions
 		yield(get_tree().create_timer(0.75), "timeout")
 		move_child($CardDeck, 1)
 		game_started = true
-		set_process(true)
-		check_for_auto_move()
+
+func _on_Restart_pressed():
+	if rand_card_id.size() != 0 && !is_dealing:
+		move_child($CardDeck, get_child_count())
+		game_started = false
+		is_dealing = true
+		$KingSprite.hide()
+		$QueenSprite.hide()
+		# on start clear the board of all ids
+		clear_board()
+		# give randomized ids to cards and move 
+		
+		# give randomized ids to cards and move 
+		give_cards_randomized_ids()
+		give_cards_positions(casc_id)
+		
+	#	yield(give_cards_randomized_pos(), "completed")
+		
+		if (Utils.sfx_toggle):
+			ShuffleSound.play()
+		arrange_card_children()
+		# wait for cards to go to their positions
+		yield(get_tree().create_timer(0.75), "timeout")
+		move_child($CardDeck, 1)
+		game_started = true
 
 # have undo_moves array to hold last moves done
 # it will hold moves like this (card, [from coord])
@@ -508,17 +545,23 @@ func _on_Undo_pressed():
 		
 		match undo_move.to_coord.x:
 			(-1.0):
+				if (Utils.sfx_toggle):
+					CardSound.play()
 				move_card_id(undo_move.card_array[0], undo_move.from_coord)
 				arrange_card_children()
 				move_card_pos(undo_move.card_array[0], undo_move.from_coord)
 				yield(get_tree().create_timer(0.07), "timeout")
 			(-2.0):
+				if (Utils.sfx_toggle):
+					CardSound.play()
 				move_card_id(undo_move.card_array[0], undo_move.from_coord)
 				arrange_card_children()
 				move_card_pos(undo_move.card_array[0], undo_move.from_coord)
 				yield(get_tree().create_timer(0.07), "timeout")
 			_:
 				if (undo_move.from_coord.x == -1):
+					if (Utils.sfx_toggle):
+						CardSound.play()
 					move_card_id(undo_move.card_array[0], undo_move.from_coord)
 					arrange_card_children()
 					move_card_pos(undo_move.card_array[0], undo_move.from_coord)
@@ -533,6 +576,8 @@ func _on_Undo_pressed():
 						move_card_id(cards_to_be_moved[index], Vector2( undo_move.from_coord.x, undo_move.from_coord.y - undo_move.card_array.size() + index + 1 ) )
 					
 					for index in range(undo_move.card_array.size()):
+						if (Utils.sfx_toggle):
+							CardSound.play()
 						move_card_pos(cards_to_be_moved[index], Vector2( undo_move.from_coord.x, undo_move.from_coord.y - undo_move.card_array.size() + index + 1 ) )
 						yield(get_tree().create_timer(0.07), "timeout")
 		
@@ -540,11 +585,13 @@ func _on_Undo_pressed():
 
 func _on_MenuButton_pressed():
 	get_tree().change_scene_to(MainMenuScene)
-	pass
+
+func _on_SFXToggleButton_toggled(button_pressed):
+	Utils.sfx_toggle = !button_pressed
 
 # ------------------------- RANDOMLY GENERATED SET ------------------------------------------------------------
 
-var card_id := []
+var rand_card_id := []
 
 #Cards: from 0 -> 51
 #4 sets - hearts (♥) -> 0
@@ -563,7 +610,7 @@ func randomize_set():
 	
 	# creating the Array that will hold nums from 0 to 51
 	for i in range(52):
-		card_id.append(i)
+		rand_card_id.append(i)
 	
 	# randomizing the number array by picking random position
 	# and swapping between them
@@ -571,11 +618,11 @@ func randomize_set():
 		var poz: int = randi() % 52
 		# aux for swapping
 		var aux
-		aux = card_id[i]
-		card_id[i] = card_id[poz]
-		card_id[poz] = aux
+		aux = rand_card_id[i]
+		rand_card_id[i] = rand_card_id[poz]
+		rand_card_id[poz] = aux
 
-# -------------------------------- BOARD FUnCTIONS ----------------------------------------------------------------
+# -------------------------------- BOARD FUNCTIONS ----------------------------------------------------------------
 
 # for cardpos2D positions:
 # - separately have positios for the free_cells, foundations and cascades
@@ -614,22 +661,23 @@ func create_cards():
 		# connect the card_press signal (specific to the card class) 
 		card.connect("card_press", self, "_on_Card_press")
 
-
-func give_cards_randomized_pos():
+func give_cards_randomized_ids():
 	# adding the randomized array to the cascade_id array
 	for i in range(52):
-		casc_id[i % 8][i / 8] = card_id[i]
-	# 1 - take every id in casc_id,
-	# 2 - look for card with that id in cards
-	# 3 - give that card the pos from casc_pos and respective coordinate
+		casc_id[i % 8][i / 8] = rand_card_id[i]
+
+func give_cards_positions(casc_id: Array):
 	for i in range(52):
 		#1
 		var id = casc_id[i % 8][i / 8]
 		#2
 		var card = cards[id]
 		#3
+		yield(get_tree().create_timer(0.005), "timeout")
 		card.pos = casc_pos[i % 8][i / 8]
 		card.coord = Vector2(i % 8, i / 8)
+	is_dealing = false
+
 
 func clear_board():
 	casc_id.clear()
@@ -649,3 +697,4 @@ func clear_board():
 	if selected_card != null:
 		selected_card.change_shader()
 		selected_card = null
+

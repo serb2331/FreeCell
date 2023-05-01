@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Assets/Fonts/AlagardTitle.tres" type="DynamicFont" id=1]
 [ext_resource path="res://Assets/Fonts/AlagardText.tres" type="DynamicFont" id=2]
@@ -6,6 +6,13 @@
 [ext_resource path="res://Scenes/MainMenu/Indicator1.gd" type="Script" id=4]
 [ext_resource path="res://Scenes/MainMenu/MainMenu.gd" type="Script" id=5]
 [ext_resource path="res://Assets/background.png" type="Texture" id=6]
+[ext_resource path="res://Assets/sfx_asset.png" type="Texture" id=7]
+[ext_resource path="res://Assets/sfx_off_asset.png" type="Texture" id=8]
+[ext_resource path="res://Assets/Fonts/AlagardBoard.tres" type="DynamicFont" id=9]
+[ext_resource path="res://Assets/close_asset.png" type="Texture" id=10]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.0117647, 0.235294, 0.239216, 1 )
 
 [node name="MainMenu" type="Control"]
 anchor_right = 1.0
@@ -31,17 +38,6 @@ bbcode_enabled = true
 bbcode_text = "[wave amp=20 freq=5][center] FreeCell[/center][/wave]"
 text = " FreeCell"
 
-[node name="Indicator1" type="RichTextLabel" parent="."]
-visible = false
-margin_left = 162.0
-margin_top = 146.0
-margin_right = 183.0
-margin_bottom = 163.0
-rect_scale = Vector2( 1.5, 1.5 )
-custom_fonts/normal_font = ExtResource( 2 )
-text = " ->"
-script = ExtResource( 4 )
-
 [node name="StartButton" type="Button" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
@@ -58,18 +54,17 @@ enabled_focus_mode = 0
 text = "Start"
 flat = true
 
-[node name="Indicator2" type="RichTextLabel" parent="."]
+[node name="Indicator" type="RichTextLabel" parent="StartButton"]
 visible = false
-margin_left = 162.0
-margin_top = 196.0
-margin_right = 183.0
-margin_bottom = 213.0
-rect_scale = Vector2( 1.5, 1.5 )
+margin_left = -19.0
+margin_top = 4.0
+margin_right = 2.0
+margin_bottom = 21.0
 custom_fonts/normal_font = ExtResource( 2 )
 text = " ->"
-script = ExtResource( 3 )
+script = ExtResource( 4 )
 
-[node name="ExitButton" type="Button" parent="."]
+[node name="RulesButton" type="Button" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -82,12 +77,114 @@ rect_scale = Vector2( 1.8, 1.8 )
 focus_mode = 0
 custom_fonts/font = ExtResource( 2 )
 enabled_focus_mode = 0
+text = "Rules"
+flat = true
+
+[node name="Indicator" type="RichTextLabel" parent="RulesButton"]
+visible = false
+margin_left = -19.0
+margin_top = 4.0
+margin_right = 2.0
+margin_bottom = 21.0
+custom_fonts/normal_font = ExtResource( 2 )
+text = " ->"
+script = ExtResource( 3 )
+
+[node name="ExitButton" type="Button" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -72.0
+margin_top = 88.0
+margin_right = -28.0
+margin_bottom = 112.0
+rect_scale = Vector2( 1.8, 1.8 )
+focus_mode = 0
+custom_fonts/font = ExtResource( 2 )
+enabled_focus_mode = 0
 text = "Exit"
 flat = true
 
-[connection signal="mouse_entered" from="StartButton" to="Indicator1" method="_on_StartButton_mouse_entered"]
-[connection signal="mouse_exited" from="StartButton" to="Indicator1" method="_on_StartButton_mouse_exited"]
+[node name="Indicator" type="RichTextLabel" parent="ExitButton"]
+visible = false
+margin_left = -19.0
+margin_top = 4.0
+margin_right = 2.0
+margin_bottom = 21.0
+custom_fonts/normal_font = ExtResource( 2 )
+text = " ->"
+script = ExtResource( 3 )
+
+[node name="SFXToggleButton" type="TextureButton" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -44.0
+margin_top = -36.0
+margin_right = -14.0
+margin_bottom = -13.0
+toggle_mode = true
+texture_normal = ExtResource( 7 )
+texture_pressed = ExtResource( 8 )
+
+[node name="RulesPanel" type="Panel" parent="."]
+visible = false
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 50.0
+margin_top = -198.0
+margin_right = -50.0
+custom_styles/panel = SubResource( 1 )
+
+[node name="Title" type="RichTextLabel" parent="RulesPanel"]
+margin_left = 10.0
+margin_top = 17.0
+margin_right = 405.0
+margin_bottom = 196.0
+rect_clip_content = false
+custom_fonts/normal_font = ExtResource( 9 )
+bbcode_enabled = true
+bbcode_text = "[u]Construction and layout[/u]
+  - A whole 52-card set is randomly dealt, face-up in 8 columns(cascades) of 7 and 6 cards.
+ - There are 4 free cells and 4 foundations 
+
+[u]Moving and Building in game[/u]
+ - All movement of cards or stacks of cards must be done through the available free cells (if you have 2 empty free cells you can move a stack of maximum 3 cards while each free cascade doubles the maximum cards)
+ - All movement must follow Solitaire rules (alternating colours and numbers descending)
+
+[u]Victory Condition[/u]
+ - When all cards are moved to their respective foundations starting with the Aces, you won!"
+text = "Construction and layout
+  - A whole 52-card set is randomly dealt, face-up in 8 columns(cascades) of 7 and 6 cards.
+ - There are 4 free cells and 4 foundations 
+
+Moving and Building in game
+ - All movement of cards or stacks of cards must be done through the available free cells (if you have 2 empty free cells you can move a stack of maximum 3 cards while each free cascade doubles the maximum cards)
+ - All movement must follow Solitaire rules (alternating colours and numbers descending)
+
+Victory Condition
+ - When all cards are moved to their respective foundations starting with the Aces, you won!"
+
+[node name="TextureButton" type="TextureButton" parent="RulesPanel"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -23.0
+margin_top = 7.0
+margin_right = -7.0
+margin_bottom = 23.0
+texture_normal = ExtResource( 10 )
+
+[connection signal="mouse_entered" from="StartButton" to="StartButton/Indicator" method="_on_StartButton_mouse_entered"]
+[connection signal="mouse_exited" from="StartButton" to="StartButton/Indicator" method="_on_StartButton_mouse_exited"]
 [connection signal="pressed" from="StartButton" to="." method="_on_StartButton_pressed"]
-[connection signal="mouse_entered" from="ExitButton" to="Indicator2" method="_on_ExitButton_mouse_entered"]
-[connection signal="mouse_exited" from="ExitButton" to="Indicator2" method="_on_ExitButton_mouse_exited"]
+[connection signal="mouse_entered" from="RulesButton" to="RulesButton/Indicator" method="_on_ExitButton_mouse_entered"]
+[connection signal="mouse_exited" from="RulesButton" to="RulesButton/Indicator" method="_on_ExitButton_mouse_exited"]
+[connection signal="pressed" from="RulesButton" to="." method="_on_RulesButton_pressed"]
+[connection signal="mouse_entered" from="ExitButton" to="ExitButton/Indicator" method="_on_ExitButton_mouse_entered"]
+[connection signal="mouse_exited" from="ExitButton" to="ExitButton/Indicator" method="_on_ExitButton_mouse_exited"]
 [connection signal="pressed" from="ExitButton" to="." method="_on_ExitButton_pressed"]
+[connection signal="toggled" from="SFXToggleButton" to="." method="_on_SFXToggleButton_toggled"]
+[connection signal="pressed" from="RulesPanel/TextureButton" to="." method="_on_RulesCloseButton_pressed"]
